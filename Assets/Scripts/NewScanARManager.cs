@@ -30,7 +30,6 @@ public class NewScanARManager : MonoBehaviour
     private bool isFirstPoint = true;
     private ARPlaneManager planeManager;
     private ARSessionOrigin sessionOrigin;
-    private ARAnchorManager anchorManager;
     private Camera arCamera;
     private State state = State.Idle;
     private GameObject asset, startPoint, endPoint, door;
@@ -43,7 +42,6 @@ public class NewScanARManager : MonoBehaviour
     {
         sessionOrigin = GetComponent<ARSessionOrigin>();
         planeManager = GetComponent<ARPlaneManager>();
-        anchorManager = GetComponent<ARAnchorManager>();
         arCamera = sessionOrigin.camera;
 
         HUD.gameObject.SetActive(false);
@@ -159,9 +157,7 @@ public class NewScanARManager : MonoBehaviour
 
 
     public void Save()
-    {
-        Debug.Log("Save Start");
-        
+    {   
         if (!Directory.Exists(Application.persistentDataPath + "/Scans"))
         {
             Directory.CreateDirectory(Application.persistentDataPath + "/Scans");
@@ -169,8 +165,6 @@ public class NewScanARManager : MonoBehaviour
         string data = JsonUtility.ToJson(linesList);
 
         File.WriteAllText(Application.persistentDataPath + $"/Scans/{SceneName}", data);
-        Debug.Log("Save Has Done!");
-        Debug.Log(data);
         SceneManager.LoadScene("MainMenu");
     }
 

@@ -24,6 +24,7 @@ public class ARLoadScanManager : MonoBehaviour
     private GameObject doorPrefab, linePrefab, HUD;
     public TMPro.TextMeshProUGUI textMeshPro;
 
+    private GameObject doorObj;
     private Ray inputRay;
     private ARPlaneManager planeManager;
     private ARSessionOrigin sessionOrigin;
@@ -40,7 +41,6 @@ public class ARLoadScanManager : MonoBehaviour
         arCamera = sessionOrigin.camera;
 
         arLineMenifest = ScanListController.lineMenifest;
-        Debug.Log(arLineMenifest);
 
         //HUD.gameObject.SetActive(false);
         state = State.placeDoor;
@@ -69,8 +69,8 @@ public class ARLoadScanManager : MonoBehaviour
             if (raycastHits.Length > 0)
             {
                 Pose hitPose = raycastHits[0].pose;
-                GameObject doorObj = Instantiate(doorPrefab, hitPose.position, hitPose.rotation);
- 
+                doorObj = Instantiate(doorPrefab, hitPose.position, hitPose.rotation);
+                doorObj.AddComponent<ARAnchor>();
                 state = State.pickmMesh;
                 //HUD.gameObject.SetActive(true);
                 DrawLines();
@@ -83,7 +83,6 @@ public class ARLoadScanManager : MonoBehaviour
     {
         foreach(var line in arLineMenifest.LineDefinitions)
         {
-            Debug.Log(line);
             Draw(line);
         }
     }
@@ -101,9 +100,9 @@ public class ARLoadScanManager : MonoBehaviour
 
         newLine.SetActive(true);
         //TODO: set the new line to be relative to the door.
-        
+        newLine.transform.parent = doorObj.transform;
 
-        Debug.Log($"DrawLine Done. Object is: {newLine}");
+        
     }
 
 }

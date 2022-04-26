@@ -21,7 +21,7 @@ public class NewScanARManager : MonoBehaviour
     // Editor Fields
     [SerializeField]
     private GameObject pointsPrefab, doorPrefab, linePrefab, HUD;
-    //public Button saveBTM;
+    [SerializeField] private Button saveBTM;
     public TMPro.TextMeshProUGUI textMeshPro;
 
     private Color color = Color.white;
@@ -30,6 +30,7 @@ public class NewScanARManager : MonoBehaviour
     private bool isFirstPoint = true;
     private ARPlaneManager planeManager;
     private ARSessionOrigin sessionOrigin;
+    private ARAnchorManager anchorManager;
     private Camera arCamera;
     private State state = State.Idle;
     private GameObject asset, startPoint, endPoint, door;
@@ -42,12 +43,12 @@ public class NewScanARManager : MonoBehaviour
     {
         sessionOrigin = GetComponent<ARSessionOrigin>();
         planeManager = GetComponent<ARPlaneManager>();
+        anchorManager = GetComponent<ARAnchorManager>();
         arCamera = sessionOrigin.camera;
 
         HUD.gameObject.SetActive(false);
         SceneName = NewScanName.SceneName;
-        //saveBTM.onClick.AddListener(Save);
-        //saveBTM.gameObject.SetActive(false);
+        saveBTM.gameObject.SetActive(false);
 
         startPoint = Instantiate(pointsPrefab, Vector3.zero, Quaternion.identity);
         endPoint = Instantiate(pointsPrefab, Vector3.zero, Quaternion.identity);
@@ -60,10 +61,6 @@ public class NewScanARManager : MonoBehaviour
         state = State.placeDoor;
         isFirstPoint = true;
     }
-
-    // use for editor
-   
-
 
     // Update is called once per frame
     void Update()
@@ -90,12 +87,9 @@ public class NewScanARManager : MonoBehaviour
                 Pose hitPose = raycastHits[0].pose;
                 door.transform.SetPositionAndRotation(hitPose.position, hitPose.rotation);
                 door.SetActive(true);
-                Debug.Log($"Door position: {door.transform.position}");
-
-                // ShowHUDPanel();
+                door.AddComponent<ARAnchor>();
                 state = State.placeLines;
-                HUD.gameObject.SetActive(true);
-                //saveBTM.gameObject.SetActive(true);
+                HUD.gameObject.SetActive(true);               
                 textMeshPro.text = "Draw Pipes";
             }
 
@@ -104,8 +98,7 @@ public class NewScanARManager : MonoBehaviour
 
     private void DetectTouch()
     {
-
-        //TODO: Detect only touch in the screen but not UI buttons
+        //TODO: Change input to Touch.Began and Touch.End to draw line. 
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
         {
             
@@ -124,6 +117,7 @@ public class NewScanARManager : MonoBehaviour
                     DrawLine();
                     startPoint.SetActive(false);
                     endPoint.SetActive(false);
+                    saveBTM.gameObject.SetActive(true);
                 }
 
                 // Toggle the bool so next we will place the next point.
@@ -135,34 +129,26 @@ public class NewScanARManager : MonoBehaviour
 
     private void DrawLine()
     {
+        //TODO: Draw continouse line 
         Vector3 mid = CalcMidVector(startPoint.transform.position, endPoint.transform.position);
-        
-        Debug.Log("Definition");
         ARLineDefinition definition = new ARLineDefinition(
-                                    1,
-                                    "Line", "Line", tag, color,
+                                    1,"Line", "Line", tag, color,
                                     startPoint.transform.position,
                                     endPoint.transform.position, mid);
-        Debug.Log($"Definition Done. Line is: {definition}");
+        
         linesList.LineDefinitions.Add(definition);
-        //Debug.Log($"Definition Done. LineList is: {linesList[0]}");
-
-        Debug.Log("DrawLine");
 
         GameObject newLine = Instantiate(linePrefab, mid, Quaternion.identity);
         
         LineRenderer lineRenderer = newLine.GetComponent<LineRenderer>();
         lineRenderer.startColor = color;
         lineRenderer.endColor = color;
-        //line settings
         lineRenderer.SetPosition(0, startPoint.transform.position);
         lineRenderer.SetPosition(1, endPoint.transform.position);
 
         newLine.SetActive(true);
         //set the new line to be relative to the door.
-        //newLine.transform.parent = door.transform;
-
-        Debug.Log($"DrawLine Done. Object is: {newLine}");
+        newLine.transform.parent = door.transform;
     }
 
     //TODO: calculate line position relative to the door

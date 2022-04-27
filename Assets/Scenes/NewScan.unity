@@ -1120,7 +1120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ab0e80cee9cc1d44928bfe488dd1e2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PointCloudPrefab: {fileID: 0}
+  m_PointCloudPrefab: {fileID: 6187203082559465165, guid: 6962c73d15d82fa4c817b88e395a2849, type: 3}
 --- !u!114 &998219962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1134,7 +1134,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_PlanePrefab: {fileID: 9193192330199541, guid: 62cb6833e81e8204aa0b4d5d69ff363f, type: 3}
-  m_DetectionMode: -1
+  m_DetectionMode: 2
 --- !u!114 &998219964
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -52,19 +52,18 @@ public class NewScanName : MonoBehaviour
     //Validate the input.
     private bool validationByName(string fileName)
     {
-        if (!Directory.Exists(Application.persistentDataPath + "/Scans")) return true;
-        
-        DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath + "/Scans");
-        FileInfo[] info = dir.GetFiles();
+        if (Directory.Exists(Application.persistentDataPath + "/Scans"))
+        {   
+            DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath + "/Scans");
+            FileInfo[] info = dir.GetFiles();
 
-        if (info.Length == 0) return true;
-       
-        foreach (FileInfo f in info)
-        {
-            if(f.Name == fileName) return true;
-        }
+            foreach (FileInfo f in info)
+            {
+                if(f.Name == fileName) return false;
+            }
 
-        return false;
+           }
+        return true;
     }
 
     public void OnPressStart()

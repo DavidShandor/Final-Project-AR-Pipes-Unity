@@ -62,7 +62,7 @@ public class NewScanName : MonoBehaviour
                 if(f.Name == fileName) return false;
             }
 
-           }
+        }
         return true;
     }
 
@@ -71,7 +71,7 @@ public class NewScanName : MonoBehaviour
         //TODO: Validate the input?
         SceneName = input.text;
         input.text = "";
-        SceneManager.LoadScene("NewScan");
+        SceneManager.LoadScene("Load");
     }
   
 }

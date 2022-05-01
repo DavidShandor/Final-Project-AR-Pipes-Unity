@@ -44,6 +44,11 @@ public class ARLoadScanManager : MonoBehaviour
 
         //HUD.gameObject.SetActive(false);
         state = State.placeDoor;
+
+        if (planeManager.trackables.count != 0)
+        {
+            ResetScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
     // Update is called once per frame
@@ -57,6 +62,14 @@ public class ARLoadScanManager : MonoBehaviour
         {
             //TODO: write function toggle pipes visibility by tags
         }
+    }
+
+    private void ResetScene(int _scene)
+    {
+        var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
+        xrManagerSettings.DeinitializeLoader();
+        SceneManager.LoadScene(_scene); // reload current scene
+        xrManagerSettings.InitializeLoaderSync();
     }
 
     private void PlaceDoor()
@@ -87,7 +100,7 @@ public class ARLoadScanManager : MonoBehaviour
         }
     }
 
-    private void Draw(ARApp.Lines.ARLineDefinition arLine)
+    private void Draw(ARLineDefinition arLine)
     {
         GameObject newLine = Instantiate(linePrefab, arLine.mid, Quaternion.identity);
         newLine.tag = arLine.tag;

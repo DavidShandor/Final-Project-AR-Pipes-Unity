@@ -8,6 +8,7 @@ using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using System;
 
 public class NewScanARManager : MonoBehaviour
 {
@@ -35,6 +36,7 @@ public class NewScanARManager : MonoBehaviour
     private GameObject asset, startPoint, endPoint, door;
     private ARLineMenifest linesList = new ARLineMenifest();
     private string SceneName;
+    private ARPlane _floor, _ceiling;
     
     private NativeArray<XRRaycastHit> raycastHits = new NativeArray<XRRaycastHit>();
 
@@ -58,6 +60,46 @@ public class NewScanARManager : MonoBehaviour
 
         state = State.placeDoor;
         isFirstPoint = true;
+        
+        //Reset the Scene if needed.
+        if (planeManager.trackables.count != 0)
+        {
+            ResetScene(SceneManager.GetActiveScene().buildIndex);
+        }
+    }
+
+    private void OnEnable()
+    {
+        SetEvents();
+    }
+
+
+    private void OnDisable()
+    {
+        ClearEvents();
+    }
+
+    private void SetEvents()
+    {
+        planeManager.planesChanged += OnPlanesChanged;
+    }
+
+    private void ClearEvents()
+    {
+        planeManager.planesChanged -= OnPlanesChanged;
+    }
+
+    private void OnPlanesChanged(ARPlanesChangedEventArgs pEventArgs)
+    {
+        /*
+         TODO: 1. Find floor and ceiling.
+               2. for each plane, check if vertical (wall) or not.
+               3. if not and is higher/lower then +-ephsilon -> remove/destroy.
+               4. else keep it. 
+             
+        NOTE: Check how ARPlaneManager manage the planes (do not destroy good planes)
+         */
+        
     }
 
     // Update is called once per frame
@@ -92,6 +134,15 @@ public class NewScanARManager : MonoBehaviour
             }
 
         }
+    }
+
+    // This metod reset the scene and load by index
+    private void ResetScene(int _scene)
+    {
+        var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
+        xrManagerSettings.DeinitializeLoader();
+        SceneManager.LoadScene(_scene); // reload current scene
+        xrManagerSettings.InitializeLoaderSync();
     }
 
     private void DetectTouch()

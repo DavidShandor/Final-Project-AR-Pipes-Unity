@@ -29,12 +29,12 @@ namespace ARApp.Lines
             for(int i = 0; i < lines.Count; i++)
             {
                 manifest.lines.Add(new ARLineData() {
-                    uid = lines[i].definition.uid,
+                    //uid = lines[i].definition.uid,
                     tag = lines[i].definition.tag,
                     color = lines[i].definition.color,
                     visible = lines[i].gameObject.activeSelf,
-                    startPosition = lines[i].definition.startPosition,
-                    endPosition = lines[i].definition.endPosition
+                    //startPosition = lines[i].definition.startPosition,
+                    //endPosition = lines[i].definition.endPosition
                 }) ;
             }
 

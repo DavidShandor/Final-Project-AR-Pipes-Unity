@@ -44,7 +44,7 @@ public class ScanListController : MonoBehaviour
 
     public void OnScanButtonClicked(FileInfo file)
     {
-        Debug.Log(file);
+        //Debug.Log(file);
         string data = File.ReadAllText(file.FullName);
         Debug.Log(data);
         lineMenifest = JsonUtility.FromJson<ARLineMenifest>(data);

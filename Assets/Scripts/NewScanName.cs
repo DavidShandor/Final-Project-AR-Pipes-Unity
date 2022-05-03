@@ -71,7 +71,7 @@ public class NewScanName : MonoBehaviour
         //TODO: Validate the input?
         SceneName = input.text;
         input.text = "";
-        SceneManager.LoadScene("Load");
+        SceneManager.LoadScene("NewScan");
     }
   
 }

@@ -6,26 +6,20 @@ namespace ARApp.Lines
     [Serializable]
     public class ARLineDefinition
     {
-        public int uid;
-        public string title;
-        public string description;
         public string tag;
         public bool visible = true;
         public Color color;
-        public Vector3 startPosition;
-        public Vector3 endPosition;
         public Vector3 mid;
+        public Vector3 start;
+        public Vector3 end;
 
-        public ARLineDefinition(int uid, string title, string description, string tag, Color color, Vector3 start, Vector3 end, Vector3 mid)
+        public ARLineDefinition(string tag, Color color, Tuple<Vector3, Vector3, Vector3> position)
         {
-            this.uid = uid;
-            this.title = title;
-            this.description = description;
             this.tag = tag;
             this.color = color;
-            this.startPosition = start;
-            this.endPosition = end;
-            this.mid = mid;
+            mid = position.Item1;
+            start = position.Item2;
+            end = position.Item3;
         }
     }
 }

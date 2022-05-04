@@ -6,7 +6,7 @@ using System.IO;
 
 public class ScanListController : MonoBehaviour
 {
-    [SerializeField] GameObject ScanBtnPref;
+    [SerializeField] GameObject ScanBtnPref, Instruction;
     [SerializeField] Transform ScanBtnParent;
     [SerializeField] Text title;
 
@@ -15,6 +15,7 @@ public class ScanListController : MonoBehaviour
     {
         title.gameObject.SetActive(false);
         LoadScanButtons();
+        Instruction.gameObject.SetActive(false);
     }
 
     private void LoadScanButtons()
@@ -44,11 +45,13 @@ public class ScanListController : MonoBehaviour
 
     public void OnScanButtonClicked(FileInfo file)
     {
-        Debug.Log(file);
+        //Debug.Log(file);
         string data = File.ReadAllText(file.FullName);
-        Debug.Log(data);
         lineMenifest = JsonUtility.FromJson<ARLineMenifest>(data);
-
+        Instruction.gameObject.SetActive(true);  
+    }
+    public void OnStartPress()
+    {
         SceneManager.LoadScene("Load");
     }
 

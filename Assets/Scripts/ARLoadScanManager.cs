@@ -1,12 +1,8 @@
-using ARApp.Lines;
 using System.Collections.Generic;
-using System.IO;
 using Unity.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using System;
 
@@ -24,6 +20,8 @@ public class ARLoadScanManager : MonoBehaviour
     private GameObject doorPrefab, linePrefab, HUD;
     public TMPro.TextMeshProUGUI textMeshPro;
 
+    private Vector3 DoorRefPosition;
+    private GameObject doorObj;
     private Ray inputRay;
     private ARPlaneManager planeManager;
     private ARSessionOrigin sessionOrigin;
@@ -35,12 +33,13 @@ public class ARLoadScanManager : MonoBehaviour
 
     void Awake()
     {
+        //ResetScene(SceneManager.GetActiveScene().buildIndex);
+        
         sessionOrigin = GetComponent<ARSessionOrigin>();
         planeManager = GetComponent<ARPlaneManager>();
         arCamera = sessionOrigin.camera;
 
         arLineMenifest = ScanListController.lineMenifest;
-        Debug.Log(arLineMenifest);
 
         //HUD.gameObject.SetActive(false);
         state = State.placeDoor;
@@ -59,6 +58,15 @@ public class ARLoadScanManager : MonoBehaviour
         }
     }
 
+    private void ResetScene(int _scene)
+    {
+        Debug.Log("Reset Scene");
+        var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
+        xrManagerSettings.DeinitializeLoader();
+        SceneManager.LoadScene(_scene); // reload current scene
+        xrManagerSettings.InitializeLoaderSync();
+    }
+
     private void PlaceDoor()
     {
         if (Input.GetMouseButtonDown(0))
@@ -69,41 +77,54 @@ public class ARLoadScanManager : MonoBehaviour
             if (raycastHits.Length > 0)
             {
                 Pose hitPose = raycastHits[0].pose;
-                GameObject doorObj = Instantiate(doorPrefab, hitPose.position, hitPose.rotation);
- 
+                doorObj = Instantiate(doorPrefab, hitPose.position, Quaternion.identity);
+                DoorRefPosition = hitPose.position;
+                string CamDir = Vector3.Dot(arCamera.transform.forward, Vector3.forward) > 0.5 ? "Forward" : "Other";
+                Debug.Log($"door direction: {CamDir}");
+                //doorObj.AddComponent<ARAnchor>();
                 state = State.pickmMesh;
                 //HUD.gameObject.SetActive(true);
-                DrawLines();
                 textMeshPro.text = "Pipes are presenting";
+                DrawLines();
             }
         }
     }
 
     private void DrawLines()
     {
+        Debug.Log("Start Draw lines.");
         foreach(var line in arLineMenifest.LineDefinitions)
         {
-            Debug.Log(line);
             Draw(line);
         }
     }
 
-    private void Draw(ARApp.Lines.ARLineDefinition arLine)
+    private void Draw(ARLineDefinition arLine)
     {
-        GameObject newLine = Instantiate(linePrefab, arLine.mid, Quaternion.identity);
-        newLine.tag = arLine.tag;
-        LineRenderer lineRenderer = newLine.GetComponent<LineRenderer>();
-        lineRenderer.startColor = arLine.color;
-        lineRenderer.endColor = arLine.color;
-        //line settings
-        lineRenderer.SetPosition(0, arLine.startPosition);
-        lineRenderer.SetPosition(1, arLine.endPosition);
+        Vector3 _mid;
+        var ReferenceDistance = CalcRelativePosition(arLine.mid, arLine.start, arLine.end, out _mid);
+        GameObject newLine = Instantiate(linePrefab, _mid, Quaternion.identity);
 
-        newLine.SetActive(true);
-        //TODO: set the new line to be relative to the door.
+        SetLine(ref newLine, arLine, ReferenceDistance);
         
-
-        Debug.Log($"DrawLine Done. Object is: {newLine}");
+        newLine.SetActive(true);
     }
 
+    private void SetLine(ref GameObject _newLine, ARLineDefinition arLine, Tuple<Vector3, Vector3> refDis)
+    {
+        _newLine.tag = arLine.tag;
+        LineRenderer lineRenderer = _newLine.GetComponent<LineRenderer>();
+        lineRenderer.startColor = arLine.color;
+        lineRenderer.endColor = arLine.color;
+        lineRenderer.SetPosition(0, refDis.Item1);
+        lineRenderer.SetPosition(1, refDis.Item2);
+        _newLine.transform.parent = doorObj.transform;
+    }
+
+    private Tuple<Vector3, Vector3> CalcRelativePosition(Vector3 mid, Vector3 start, Vector3 end, out Vector3 _mid)
+    {
+        _mid = DoorRefPosition - mid; // mid
+        return new Tuple<Vector3, Vector3>(DoorRefPosition - start, // start
+                                           DoorRefPosition - end);// end
+    }
 }

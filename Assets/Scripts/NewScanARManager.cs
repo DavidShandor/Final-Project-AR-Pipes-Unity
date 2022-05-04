@@ -1,5 +1,3 @@
-using ARApp.Lines;
-using System.Collections.Generic;
 using System.IO;
 using Unity.Collections;
 using UnityEngine;
@@ -8,6 +6,7 @@ using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using System;
 
 public class NewScanARManager : MonoBehaviour
 {
@@ -21,7 +20,7 @@ public class NewScanARManager : MonoBehaviour
     // Editor Fields
     [SerializeField]
     private GameObject pointsPrefab, doorPrefab, linePrefab, HUD;
-    //public Button saveBTM;
+    [SerializeField] private Button saveBTM;
     public TMPro.TextMeshProUGUI textMeshPro;
 
     private Color color = Color.white;
@@ -33,21 +32,22 @@ public class NewScanARManager : MonoBehaviour
     private Camera arCamera;
     private State state = State.Idle;
     private GameObject asset, startPoint, endPoint, door;
-    private ARLineMenifest linesList = new ARLineMenifest();
+    private ARLineMenifest ScanMenifest = new ARLineMenifest();
     private string SceneName;
     
     private NativeArray<XRRaycastHit> raycastHits = new NativeArray<XRRaycastHit>();
 
     void Awake()
     {
+        //ResetScene(SceneManager.GetActiveScene().buildIndex);
+        
         sessionOrigin = GetComponent<ARSessionOrigin>();
         planeManager = GetComponent<ARPlaneManager>();
         arCamera = sessionOrigin.camera;
 
         HUD.gameObject.SetActive(false);
         SceneName = NewScanName.SceneName;
-        //saveBTM.onClick.AddListener(Save);
-        //saveBTM.gameObject.SetActive(false);
+        saveBTM.gameObject.SetActive(false);
 
         startPoint = Instantiate(pointsPrefab, Vector3.zero, Quaternion.identity);
         endPoint = Instantiate(pointsPrefab, Vector3.zero, Quaternion.identity);
@@ -60,9 +60,6 @@ public class NewScanARManager : MonoBehaviour
         state = State.placeDoor;
         isFirstPoint = true;
     }
-
-    // use for editor
-   
 
 
     // Update is called once per frame
@@ -88,27 +85,29 @@ public class NewScanARManager : MonoBehaviour
             if (raycastHits.Length > 0)
             {
                 Pose hitPose = raycastHits[0].pose;
-                door.transform.SetPositionAndRotation(hitPose.position, hitPose.rotation);
+                door.transform.SetPositionAndRotation(hitPose.position, Quaternion.identity);
                 door.SetActive(true);
-                Debug.Log($"Door position: {door.transform.position}");
-
-                // ShowHUDPanel();
                 state = State.placeLines;
-                HUD.gameObject.SetActive(true);
-                //saveBTM.gameObject.SetActive(true);
+                HUD.gameObject.SetActive(true);               
                 textMeshPro.text = "Draw Pipes";
             }
-
         }
+    }
+
+    // This metod reset the scene and load by index
+    private void ResetScene(int _scene)
+    {
+        Debug.Log("Reset Scene");
+        var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
+        xrManagerSettings.DeinitializeLoader();
+        SceneManager.LoadScene(_scene); // reload current scene
+        xrManagerSettings.InitializeLoaderSync();
     }
 
     private void DetectTouch()
     {
-
-        //TODO: Detect only touch in the screen but not UI buttons
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
-        {
-            
+        {      
             inputRay = arCamera.ScreenPointToRay(Input.mousePosition);
             raycastHits = planeManager.Raycast(inputRay, TrackableType.All, Allocator.Temp);
 
@@ -124,6 +123,7 @@ public class NewScanARManager : MonoBehaviour
                     DrawLine();
                     startPoint.SetActive(false);
                     endPoint.SetActive(false);
+                    saveBTM.gameObject.SetActive(true);
                 }
 
                 // Toggle the bool so next we will place the next point.
@@ -135,56 +135,71 @@ public class NewScanARManager : MonoBehaviour
 
     private void DrawLine()
     {
-        Vector3 mid = CalcMidVector(startPoint.transform.position, endPoint.transform.position);
+        Vector3 mid;
+        var DistanceVectors = CalcVectors(startPoint.transform.position, 
+                                          endPoint.transform.position, 
+                                          door.transform.position, out mid);
+
+        addNewLine(DistanceVectors);
         
-        Debug.Log("Definition");
-        ARLineDefinition definition = new ARLineDefinition(
-                                    1,
-                                    "Line", "Line", tag, color,
-                                    startPoint.transform.position,
-                                    endPoint.transform.position, mid);
-        Debug.Log($"Definition Done. Line is: {definition}");
-        linesList.LineDefinitions.Add(definition);
-        //Debug.Log($"Definition Done. LineList is: {linesList[0]}");
-
-        Debug.Log("DrawLine");
-
         GameObject newLine = Instantiate(linePrefab, mid, Quaternion.identity);
+
+        SetLine(ref newLine);
         
-        LineRenderer lineRenderer = newLine.GetComponent<LineRenderer>();
-        lineRenderer.startColor = color;
-        lineRenderer.endColor = color;
-        //line settings
-        lineRenderer.SetPosition(0, startPoint.transform.position);
-        lineRenderer.SetPosition(1, endPoint.transform.position);
-
-        newLine.SetActive(true);
-        //set the new line to be relative to the door.
-        //newLine.transform.parent = door.transform;
-
-        Debug.Log($"DrawLine Done. Object is: {newLine}");
+        newLine.SetActive(true);  
     }
 
-    //TODO: calculate line position relative to the door
-    private static Vector3 CalcMidVector(Vector3 startPoint, Vector3 endPoint)
+    private void SetLine(ref GameObject _lineobj)
     {
-        return Vector3.Lerp(startPoint, endPoint, 0.5f);
+        LineRenderer lineRenderer = _lineobj.GetComponent<LineRenderer>();
+        lineRenderer.startColor = color;
+        lineRenderer.endColor = color;
+        lineRenderer.SetPosition(0, startPoint.transform.position);
+        lineRenderer.SetPosition(1, endPoint.transform.position);
+        _lineobj.transform.parent = door.transform;
+    }
+
+    /// <summary>
+    /// Create new line Descriptor and add it to the line container 
+    /// </summary>
+    /// <param name="distanceVectors">Tuple of position vectors (mid, start, end)</param>
+    private void addNewLine(Tuple<Vector3, Vector3, Vector3> distanceVectors)
+    {
+        ARLineDefinition definition = new ARLineDefinition(tag, color, distanceVectors);
+
+        ScanMenifest.LineDefinitions.Add(definition);
+    }
+
+    /// <summary>
+    /// Return the Vectors of all the position relative to door and scene, so next time 
+    /// </summary>
+    /// <param name="startPoint">Position of the start point</param>
+    /// <param name="endPoint">Position of the end point</param>
+    /// <param name="doorPoint">Position of the door</param>
+    /// <param name="_mid"></param>
+    /// <returns>1. Middle position between start point and end point<br/>
+    ///          2. Middle point relative to door position.<br/>
+    ///          3. Start point relative to door position.<br/>
+    ///          4. End point relative to door position.</returns>
+    private static Tuple<Vector3,Vector3,Vector3> CalcVectors(Vector3 startPoint, Vector3 endPoint, Vector3 doorPoint, out Vector3 _mid)
+    {
+        _mid = Vector3.Lerp(startPoint, endPoint, 0.5f);
+        return new Tuple<Vector3, Vector3, Vector3>(doorPoint - _mid,
+                                                    doorPoint - startPoint,
+                                                    doorPoint - endPoint);
     }
 
 
     public void Save()
-    {
-        Debug.Log("Save Start");
-        
+    {   
         if (!Directory.Exists(Application.persistentDataPath + "/Scans"))
         {
             Directory.CreateDirectory(Application.persistentDataPath + "/Scans");
         }
-        string data = JsonUtility.ToJson(linesList);
+        string data = JsonUtility.ToJson(ScanMenifest);
+        Debug.Log(data);
 
         File.WriteAllText(Application.persistentDataPath + $"/Scans/{SceneName}", data);
-        Debug.Log("Save Has Done!");
-        Debug.Log(data);
         SceneManager.LoadScene("MainMenu");
     }
 

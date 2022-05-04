@@ -87,7 +87,7 @@ public class NewScanARManager : MonoBehaviour
             if (raycastHits.Length > 0)
             {
                 Pose hitPose = raycastHits[0].pose;
-                door.transform.SetPositionAndRotation(hitPose.position, hitPose.rotation);
+                door.transform.SetPositionAndRotation(hitPose.position, Quaternion.identity);
                 door.SetActive(true);
                 state = State.placeLines;
                 HUD.gameObject.SetActive(true);               
@@ -142,7 +142,6 @@ public class NewScanARManager : MonoBehaviour
                                           endPoint.transform.position, 
                                           door.transform.position, out mid);
 
-        Debug.Log(DistanceVectors);
         addNewLine(DistanceVectors);
         
         GameObject newLine = Instantiate(linePrefab, mid, Quaternion.identity);

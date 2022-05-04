@@ -81,8 +81,10 @@ public class ARLoadScanManager : MonoBehaviour
             if (raycastHits.Length > 0)
             {
                 Pose hitPose = raycastHits[0].pose;
-                doorObj = Instantiate(doorPrefab, hitPose.position, hitPose.rotation);
+                doorObj = Instantiate(doorPrefab, hitPose.position, Quaternion.identity);
                 DoorRefPosition = hitPose.position;
+                string CamDir = Vector3.Dot(arCamera.transform.forward, Vector3.forward) > 0.5 ? "Forward" : "Other";
+                Debug.Log($"door direction: {CamDir}");
                 //doorObj.AddComponent<ARAnchor>();
                 state = State.pickmMesh;
                 //HUD.gameObject.SetActive(true);

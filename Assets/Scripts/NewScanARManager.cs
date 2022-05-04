@@ -12,7 +12,7 @@ public class NewScanARManager : MonoBehaviour
 {
     private enum State : int
     {
-        Idle = 0,
+        findDoor = 0,
         placeDoor = 1,
         placeLines = 2
     }
@@ -20,7 +20,7 @@ public class NewScanARManager : MonoBehaviour
     // Editor Fields
     [SerializeField]
     private GameObject pointsPrefab, doorPrefab, linePrefab, HUD;
-    [SerializeField] private Button saveBTM;
+    [SerializeField] private Button saveBTM, okBTM;
     public TMPro.TextMeshProUGUI textMeshPro;
 
     private Color color = Color.white;
@@ -30,7 +30,7 @@ public class NewScanARManager : MonoBehaviour
     private ARPlaneManager planeManager;
     private ARSessionOrigin sessionOrigin;
     private Camera arCamera;
-    private State state = State.Idle;
+    private State state = (State)SceneStage.ResetScene;
     private GameObject asset, startPoint, endPoint, door;
     private ARLineMenifest ScanMenifest = new ARLineMenifest();
     private string SceneName;
@@ -39,14 +39,20 @@ public class NewScanARManager : MonoBehaviour
 
     void Awake()
     {
-        //ResetScene(SceneManager.GetActiveScene().buildIndex);
-        
+        Debug.Log($"State is: {state}");
+       
+        if (state == State.placeDoor)
+        {
+            textMeshPro.text = "Touch the Left-Rigth\nDoor Corner to Place Door";
+            okBTM.gameObject.SetActive(false);
+        }
         sessionOrigin = GetComponent<ARSessionOrigin>();
         planeManager = GetComponent<ARPlaneManager>();
         arCamera = sessionOrigin.camera;
 
         HUD.gameObject.SetActive(false);
         SceneName = NewScanName.SceneName;
+        Debug.Log(SceneName);
         saveBTM.gameObject.SetActive(false);
 
         startPoint = Instantiate(pointsPrefab, Vector3.zero, Quaternion.identity);
@@ -57,7 +63,6 @@ public class NewScanARManager : MonoBehaviour
         endPoint.SetActive(false);
         door.SetActive(false);
 
-        state = State.placeDoor;
         isFirstPoint = true;
     }
 
@@ -73,6 +78,12 @@ public class NewScanARManager : MonoBehaviour
         {
             DetectTouch();
         }
+    }
+
+    public void OnOkPressed()
+    {
+        SceneStage.ResetScene = (int)State.placeDoor;
+        ResetScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void PlaceDoor()
@@ -191,7 +202,9 @@ public class NewScanARManager : MonoBehaviour
 
 
     public void Save()
-    {   
+    {
+        SceneStage.ResetScene = 0;
+
         if (!Directory.Exists(Application.persistentDataPath + "/Scans"))
         {
             Directory.CreateDirectory(Application.persistentDataPath + "/Scans");

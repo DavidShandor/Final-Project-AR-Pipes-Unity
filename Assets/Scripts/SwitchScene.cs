@@ -5,10 +5,21 @@ using UnityEngine.SceneManagement;
 
 public class SwitchScene : MonoBehaviour
 {
+    [HideInInspector]
+    public static string _action;
     public void SwitchScenes(string scene)
     {
-        //TODO: Check how to reset scene
-        //SceneManager.LoadScene(SceneManager.GetSceneByName(scene).buildIndex);
         SceneManager.LoadScene(scene);
+    }
+
+    public void LoadDelete()
+    {
+        _action = "Delete";
+        SwitchScenes("LoadList");
+    }
+    public void LoadList()
+    {
+        _action = "Load";
+        SwitchScenes("LoadList");
     }
 }

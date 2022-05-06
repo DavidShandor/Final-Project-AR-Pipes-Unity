@@ -2,13 +2,15 @@ using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
-
+using System;
 
 public class ScanListController : MonoBehaviour
 {
     [SerializeField] GameObject ScanBtnPref, Instruction;
     [SerializeField] Transform ScanBtnParent;
     [SerializeField] Text title;
+    
+    private string _action = SwitchScene._action;
 
     [HideInInspector] public static ARLineMenifest lineMenifest;
     void Start()
@@ -45,11 +47,30 @@ public class ScanListController : MonoBehaviour
 
     public void OnScanButtonClicked(FileInfo file)
     {
-        //Debug.Log(file);
+        switch (_action) { 
+            case "Delete": deleteFileRoutine(file);
+                break;
+            case "Load": LoadScan(file);
+                break;
+
+            default: break;
+            }
+    }
+
+    private void LoadScan(FileInfo file)
+    {
         string data = File.ReadAllText(file.FullName);
         lineMenifest = JsonUtility.FromJson<ARLineMenifest>(data);
-        Instruction.gameObject.SetActive(true);  
+        Instruction.gameObject.SetActive(true);
     }
+
+    private void deleteFileRoutine(FileInfo file)
+    {
+        //TODO: Show Alert Message
+        file.Delete();
+        //TODO: Refresh list.
+    }
+
     public void OnStartPress()
     {
         SceneManager.LoadScene("Load");

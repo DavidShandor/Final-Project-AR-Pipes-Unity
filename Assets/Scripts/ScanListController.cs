@@ -9,10 +9,15 @@ public class ScanListController : MonoBehaviour
     [SerializeField] GameObject ScanBtnPref, Instruction;
     [SerializeField] Transform ScanBtnParent;
     [SerializeField] Text title;
-    
-    private string _action = SwitchScene._action;
+
+    private string _action;
 
     [HideInInspector] public static ARLineMenifest lineMenifest;
+
+    private void OnEnable()
+    {
+       _action = SwitchScene._action;
+    }
     void Start()
     {
         title.gameObject.SetActive(false);
@@ -61,21 +66,23 @@ public class ScanListController : MonoBehaviour
     {
         string data = File.ReadAllText(file.FullName);
         lineMenifest = JsonUtility.FromJson<ARLineMenifest>(data);
-        Instruction.gameObject.SetActive(true);
+        SceneManager.LoadScene("Load");
     }
 
     private void deleteFileRoutine(FileInfo file)
     {
-        //TODO: Show Alert Message
-        file.Delete();
-        //TODO: Refresh list.
+        Instruction.gameObject.SetActive(true);
     }
 
-    public void OnStartPress()
+    public void OnConfirmPress()
     {
-        SceneManager.LoadScene("Load");
+     //TODO: DELETE THE FILE  
     }
 
+    public void OnCanclePress()
+    {
+        Instruction.gameObject.SetActive(false);
+    }
 
     private void NoList()
     {

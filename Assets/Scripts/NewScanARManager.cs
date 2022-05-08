@@ -108,7 +108,6 @@ public class NewScanARManager : MonoBehaviour
     // This metod reset the scene and load by index
     private void ResetScene(int _scene)
     {
-        Debug.Log("Reset Scene");
         var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
         xrManagerSettings.DeinitializeLoader();
         SceneManager.LoadScene(_scene); // reload current scene

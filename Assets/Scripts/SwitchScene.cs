@@ -12,14 +12,9 @@ public class SwitchScene : MonoBehaviour
         SceneManager.LoadScene(scene);
     }
 
-    public void LoadDelete()
+    public void LoadList(string _act)
     {
-        _action = "Delete";
-        SwitchScenes("LoadList");
-    }
-    public void LoadList()
-    {
-        _action = "Load";
+        _action = _act;
         SwitchScenes("LoadList");
     }
 }

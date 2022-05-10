@@ -46,7 +46,7 @@ public class ARLoadScanManager : MonoBehaviour
 
         arLineMenifest = ScanListController.lineMenifest;
 
-        //HUD.gameObject.SetActive(false); 
+        HUD.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -56,10 +56,10 @@ public class ARLoadScanManager : MonoBehaviour
         {
             PlaceDoor();
         }
-        else if (state == State.pickmMesh)
-        {
-            //TODO: write function toggle pipes visibility by tags
-        }
+        //else if (state == State.pickmMesh)
+        //{
+        //    //TODO: write function toggle pipes visibility by tags
+        //}
     }
     public void OnOkPressed()
     {
@@ -89,7 +89,7 @@ public class ARLoadScanManager : MonoBehaviour
                 doorObj = Instantiate(doorPrefab, hitPose.position, Quaternion.identity);
                 DoorRefPosition = hitPose.position;
                 state = State.pickmMesh;
-                //HUD.gameObject.SetActive(true);
+                HUD.gameObject.SetActive(true);
                 textMeshPro.text = "Pipes are presenting";
                 DrawLines();
             }
@@ -131,5 +131,16 @@ public class ARLoadScanManager : MonoBehaviour
         _mid = DoorRefPosition - mid; // mid
         return new Tuple<Vector3, Vector3>(DoorRefPosition - start, // start
                                            DoorRefPosition - end);// end
+    }
+
+    public void toggelPipes(string _tag)
+    {
+        foreach (var line in lines)
+        {
+            if (line.tag == _tag)
+            {
+                line.SetActive(!line.activeSelf);
+            }
+        }
     }
 }

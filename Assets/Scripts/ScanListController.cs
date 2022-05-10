@@ -6,33 +6,40 @@ using System;
 
 public class ScanListController : MonoBehaviour
 {
-    [SerializeField] GameObject ScanBtnPref, Instruction;
-    [SerializeField] Transform ScanBtnParent;
-    [SerializeField] Text title;
-
-    private string _action;
-
+    [SerializeField] private GameObject ScanBtnPref, DeleteAlert;
+    [SerializeField] private Transform ScanBtnParent;
+    [SerializeField] private Text title, _scanName;
+    [SerializeField] private Button btnCancel, btnConfirm;
     [HideInInspector] public static ARLineMenifest lineMenifest;
 
+    private FileInfo _file;
+    private GameObject toDestroy;
+    private string _action;
+    
+  
     private void OnEnable()
     {
        _action = SwitchScene._action;
+        Debug.Log(_action);
     }
     void Start()
     {
         title.gameObject.SetActive(false);
-        LoadScanButtons();
-        Instruction.gameObject.SetActive(false);
-    }
+        DeleteAlert.gameObject.SetActive(false);
 
-    private void LoadScanButtons()
-    {
         if (!Directory.Exists(Application.persistentDataPath + "/Scans"))
         {
             NoList();
             return;
         }
+        else
+        {
+            LoadScanButtons();
+        }
+    }
 
+    private void LoadScanButtons()
+    {
         DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath + "/Scans");
         FileInfo[] info = dir.GetFiles();
 
@@ -50,10 +57,10 @@ public class ScanListController : MonoBehaviour
         }
     }
 
-    public void OnScanButtonClicked(FileInfo file)
+    public void OnScanButtonClicked(FileInfo file, ScanButtonItem obj)
     {
         switch (_action) { 
-            case "Delete": deleteFileRoutine(file);
+            case "Delete": deleteFileRoutine(file, obj);
                 break;
             case "Load": LoadScan(file);
                 break;
@@ -69,19 +76,34 @@ public class ScanListController : MonoBehaviour
         SceneManager.LoadScene("Load");
     }
 
-    private void deleteFileRoutine(FileInfo file)
+    private void deleteFileRoutine(FileInfo file, ScanButtonItem _obj)
     {
-        Instruction.gameObject.SetActive(true);
+        Debug.Log("Try to Delete File");
+        _scanName.text = file.Name;
+        _file = file;
+        toDestroy = _obj.gameObject;
+        DeleteAlert.SetActive(true);
     }
 
+    
     public void OnConfirmPress()
     {
-     //TODO: DELETE THE FILE  
+        try
+        {
+            _file.Delete();
+            Destroy(toDestroy);
+            DeleteAlert.SetActive(false);      
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex.ToString());
+        }
     }
 
+    
     public void OnCanclePress()
     {
-        Instruction.gameObject.SetActive(false);
+        DeleteAlert.SetActive(false);
     }
 
     private void NoList()

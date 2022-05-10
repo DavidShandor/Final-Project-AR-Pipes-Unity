@@ -60,7 +60,8 @@ public class ScanListController : MonoBehaviour
     public void OnScanButtonClicked(FileInfo file, ScanButtonItem obj)
     {
         switch (_action) { 
-            case "Delete": deleteFileRoutine(file, obj);
+            case "Delete": 
+                deleteFileRoutine(file, obj);
                 break;
             case "Load": LoadScan(file);
                 break;
@@ -92,7 +93,12 @@ public class ScanListController : MonoBehaviour
         {
             _file.Delete();
             Destroy(toDestroy);
-            DeleteAlert.SetActive(false);      
+            DeleteAlert.SetActive(false);
+
+            if (new DirectoryInfo(Application.persistentDataPath + "/Scans").GetFiles().Length == 0)
+            {
+                NoList();
+            }
         }
         catch (Exception ex)
         {

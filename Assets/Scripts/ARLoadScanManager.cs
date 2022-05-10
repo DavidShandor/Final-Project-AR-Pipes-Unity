@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using UnityEngine.SceneManagement;
@@ -10,7 +11,7 @@ public class ARLoadScanManager : MonoBehaviour
 {
     private enum State : int
     {
-        Idle = 0,
+        findDoor = 0,
         placeDoor = 1,
         pickmMesh = 2
     }
@@ -19,6 +20,7 @@ public class ARLoadScanManager : MonoBehaviour
     [SerializeField]
     private GameObject doorPrefab, linePrefab, HUD;
     public TMPro.TextMeshProUGUI textMeshPro;
+    public Button okBTM;
 
     private Vector3 DoorRefPosition;
     private GameObject doorObj;
@@ -26,23 +28,25 @@ public class ARLoadScanManager : MonoBehaviour
     private ARPlaneManager planeManager;
     private ARSessionOrigin sessionOrigin;
     private Camera arCamera;
-    private State state = State.Idle;
+    private State state = (State)SceneStage.ResetScene;
     private ARLineMenifest arLineMenifest;
     private List<GameObject> lines = new List<GameObject>();
     private NativeArray<XRRaycastHit> raycastHits = new NativeArray<XRRaycastHit>();
 
     void Awake()
-    {
-        //ResetScene(SceneManager.GetActiveScene().buildIndex);
-        
+    {   
+        if(state == State.placeDoor)
+        {
+            textMeshPro.text = "Touch the Left-Rigth\nDoor Corner to show pipes";
+            okBTM.gameObject.SetActive(false);
+        }
         sessionOrigin = GetComponent<ARSessionOrigin>();
         planeManager = GetComponent<ARPlaneManager>();
         arCamera = sessionOrigin.camera;
 
         arLineMenifest = ScanListController.lineMenifest;
 
-        //HUD.gameObject.SetActive(false);
-        state = State.placeDoor;
+        HUD.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -52,10 +56,15 @@ public class ARLoadScanManager : MonoBehaviour
         {
             PlaceDoor();
         }
-        else if (state == State.pickmMesh)
-        {
-            //TODO: write function toggle pipes visibility by tags
-        }
+        //else if (state == State.pickmMesh)
+        //{
+        //    //TODO: write function toggle pipes visibility by tags
+        //}
+    }
+    public void OnOkPressed()
+    {
+        SceneStage.ResetScene = (int)State.placeDoor;
+        ResetScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void ResetScene(int _scene)
@@ -79,11 +88,8 @@ public class ARLoadScanManager : MonoBehaviour
                 Pose hitPose = raycastHits[0].pose;
                 doorObj = Instantiate(doorPrefab, hitPose.position, Quaternion.identity);
                 DoorRefPosition = hitPose.position;
-                string CamDir = Vector3.Dot(arCamera.transform.forward, Vector3.forward) > 0.5 ? "Forward" : "Other";
-                Debug.Log($"door direction: {CamDir}");
-                //doorObj.AddComponent<ARAnchor>();
                 state = State.pickmMesh;
-                //HUD.gameObject.SetActive(true);
+                HUD.gameObject.SetActive(true);
                 textMeshPro.text = "Pipes are presenting";
                 DrawLines();
             }
@@ -92,7 +98,6 @@ public class ARLoadScanManager : MonoBehaviour
 
     private void DrawLines()
     {
-        Debug.Log("Start Draw lines.");
         foreach(var line in arLineMenifest.LineDefinitions)
         {
             Draw(line);
@@ -104,7 +109,7 @@ public class ARLoadScanManager : MonoBehaviour
         Vector3 _mid;
         var ReferenceDistance = CalcRelativePosition(arLine.mid, arLine.start, arLine.end, out _mid);
         GameObject newLine = Instantiate(linePrefab, _mid, Quaternion.identity);
-
+        lines.Add(newLine);
         SetLine(ref newLine, arLine, ReferenceDistance);
         
         newLine.SetActive(true);
@@ -126,5 +131,16 @@ public class ARLoadScanManager : MonoBehaviour
         _mid = DoorRefPosition - mid; // mid
         return new Tuple<Vector3, Vector3>(DoorRefPosition - start, // start
                                            DoorRefPosition - end);// end
+    }
+
+    public void toggelPipes(string _tag)
+    {
+        foreach (var line in lines)
+        {
+            if (line.tag == _tag)
+            {
+                line.SetActive(!line.activeSelf);
+            }
+        }
     }
 }

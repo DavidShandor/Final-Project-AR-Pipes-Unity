@@ -16,6 +16,6 @@ public class ScanButtonItem : MonoBehaviour
         fileName.text = file.Name;
     }
     public void OnScanButtonClick() { 
-        scanListController.OnScanButtonClicked(file);
+        scanListController.OnScanButtonClicked(file, this);
     }
 }

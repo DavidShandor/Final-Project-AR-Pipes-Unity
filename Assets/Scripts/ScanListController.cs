@@ -6,10 +6,10 @@ using System;
 
 public class ScanListController : MonoBehaviour
 {
-    [SerializeField] private GameObject ScanBtnPref, DeleteAlert;
+    [SerializeField] private GameObject ScanBtnPref, AlertMessage;
     [SerializeField] private Transform ScanBtnParent;
-    [SerializeField] private Text title, _scanName;
-    [SerializeField] private Button btnCancel, btnConfirm;
+    [SerializeField] private Text title, _scanName, Message;
+    //[SerializeField] private Button btnCancel, btnConfirm;
     [HideInInspector] public static ARLineMenifest lineMenifest;
 
     private FileInfo _file;
@@ -25,7 +25,7 @@ public class ScanListController : MonoBehaviour
     void Start()
     {
         title.gameObject.SetActive(false);
-        DeleteAlert.gameObject.SetActive(false);
+        AlertMessage.gameObject.SetActive(false);
 
         if (!Directory.Exists(Application.persistentDataPath + "/Scans"))
         {
@@ -59,20 +59,16 @@ public class ScanListController : MonoBehaviour
 
     public void OnScanButtonClicked(FileInfo file, ScanButtonItem obj)
     {
-        switch (_action) { 
-            case "Delete": 
-                deleteFileRoutine(file, obj);
-                break;
-            case "Load": LoadScan(file);
-                break;
-
-            default: break;
-            }
+        _scanName.text = file.Name;
+        _file = file;
+        Message.text = $"Are you sure want to {_action} this scan?";
+        toDestroy = obj.gameObject;
+        AlertMessage.SetActive(true);
     }
 
-    private void LoadScan(FileInfo file)
+    private void LoadScan()
     {
-        string data = File.ReadAllText(file.FullName);
+        string data = File.ReadAllText(_file.FullName);
         lineMenifest = JsonUtility.FromJson<ARLineMenifest>(data);
         SceneManager.LoadScene("Load");
     }
@@ -83,17 +79,33 @@ public class ScanListController : MonoBehaviour
         _scanName.text = file.Name;
         _file = file;
         toDestroy = _obj.gameObject;
-        DeleteAlert.SetActive(true);
+        AlertMessage.SetActive(true);
     }
 
     
     public void OnConfirmPress()
     {
+        switch (_action)
+        {
+            case "Delete":
+                deleteFile();
+                break;
+            case "Load":
+                LoadScan();
+                break;
+
+            default: break;
+        }
+
+    }
+
+    private void deleteFile()
+    {
         try
         {
             _file.Delete();
             Destroy(toDestroy);
-            DeleteAlert.SetActive(false);
+            AlertMessage.SetActive(false);
 
             if (new DirectoryInfo(Application.persistentDataPath + "/Scans").GetFiles().Length == 0)
             {
@@ -106,10 +118,9 @@ public class ScanListController : MonoBehaviour
         }
     }
 
-    
-    public void OnCanclePress()
+    public void OnCancelPress()
     {
-        DeleteAlert.SetActive(false);
+        AlertMessage.SetActive(false);
     }
 
     private void NoList()

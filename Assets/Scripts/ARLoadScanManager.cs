@@ -17,19 +17,20 @@ public class ARLoadScanManager : MonoBehaviour
     }
 
     // Editor Fields
-    [SerializeField]
-    private GameObject doorPrefab, linePrefab, HUD;
-    public TMPro.TextMeshProUGUI textMeshPro;
     public Button okBTM;
+    public TMPro.TextMeshProUGUI textMeshPro;
+    
+    [SerializeField]
+    private GameObject doorPrefab, linePrefab,MenuIcon, MenuPanel, Alert;
 
-    private Vector3 DoorRefPosition;
-    private GameObject doorObj;
     private Ray inputRay;
+    private Camera arCamera;
+    private GameObject doorObj;
+    private Vector3 DoorRefPosition;
     private ARPlaneManager planeManager;
     private ARSessionOrigin sessionOrigin;
-    private Camera arCamera;
-    private State state = (State)SceneStage.ResetScene;
     private ARLineMenifest arLineMenifest;
+    private State state = (State)SceneStage.ResetScene;
     private List<GameObject> lines = new List<GameObject>();
     private NativeArray<XRRaycastHit> raycastHits = new NativeArray<XRRaycastHit>();
 
@@ -46,7 +47,9 @@ public class ARLoadScanManager : MonoBehaviour
 
         arLineMenifest = ScanListController.lineMenifest;
 
-        HUD.gameObject.SetActive(false);
+        MenuPanel.SetActive(false);
+        MenuIcon.SetActive(false);
+        Alert.SetActive(false);
     }
 
     // Update is called once per frame
@@ -56,10 +59,6 @@ public class ARLoadScanManager : MonoBehaviour
         {
             PlaceDoor();
         }
-        //else if (state == State.pickmMesh)
-        //{
-        //    //TODO: write function toggle pipes visibility by tags
-        //}
     }
     public void OnOkPressed()
     {
@@ -89,7 +88,7 @@ public class ARLoadScanManager : MonoBehaviour
                 doorObj = Instantiate(doorPrefab, hitPose.position, Quaternion.identity);
                 DoorRefPosition = hitPose.position;
                 state = State.pickmMesh;
-                HUD.gameObject.SetActive(true);
+                MenuIcon.SetActive(true);
                 textMeshPro.text = "Pipes are presenting";
                 DrawLines();
             }
@@ -133,14 +132,64 @@ public class ARLoadScanManager : MonoBehaviour
                                            DoorRefPosition - end);// end
     }
 
-    public void toggelPipes(string _tag)
+    public void OnTogglePipes(string _tag, bool flag)
     {
+        Debug.Log($"Try to toggle Pipe:\ntag = {_tag}, flag = {flag}");
         foreach (var line in lines)
         {
             if (line.tag == _tag)
             {
-                line.SetActive(!line.activeSelf);
+                line.SetActive(flag);
             }
         }
+    }
+
+    public void OnToggleElec(bool flag)
+    {
+        OnTogglePipes("Electricity", flag);
+    }
+    public void OnToggleCold(bool flag)
+    {
+        OnTogglePipes("Cold", flag);
+    } 
+    public void OnToggleHot(bool flag)
+    {
+        OnTogglePipes("Hot", flag);
+    }
+    public void OnTogglePlane(bool flag)
+    {
+        Debug.Log($"Try to Toggle Planes, flag is: {flag}");
+        planeManager.enabled = flag;
+
+        foreach (var plane in planeManager.trackables)
+        {
+            plane.gameObject.SetActive(flag);
+        }
+
+    }
+
+    public void OnExitPress()
+    {
+        Alert.SetActive(true);
+        MenuPanel.SetActive(false);
+    }
+
+    public void onMenuPress()
+    {
+        MenuPanel.SetActive(true);
+    }
+    public void OnExitMenuPress()
+    {
+        MenuPanel.SetActive(false);
+    }
+    
+    public void OnConfirmPress()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+    public void OnCancelPress()
+    {
+        Alert.SetActive(false);
+        MenuPanel.SetActive(true);
     }
 }

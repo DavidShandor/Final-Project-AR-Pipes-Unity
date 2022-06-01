@@ -134,7 +134,6 @@ public class ARLoadScanManager : MonoBehaviour
 
     public void OnTogglePipes(string _tag, bool flag)
     {
-        Debug.Log($"Try to toggle Pipe:\ntag = {_tag}, flag = {flag}");
         foreach (var line in lines)
         {
             if (line.tag == _tag)

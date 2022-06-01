@@ -1,5 +1,7 @@
 using System.IO;
 using Unity.Collections;
+using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
@@ -19,20 +21,21 @@ public class NewScanARManager : MonoBehaviour
 
     // Editor Fields
     [SerializeField]
-    private GameObject pointsPrefab, doorPrefab, linePrefab, HUD;
-    [SerializeField] private Button saveBTM, okBTM;
-    public TMPro.TextMeshProUGUI textMeshPro;
+    private GameObject pointsPrefab, doorPrefab, linePrefab, HUD, MenuIcon, MenuPanel, Alert;
+    [SerializeField] private Button okBTM;
+    public TMPro.TextMeshProUGUI textMeshPro, alertText;
 
     private Color color = Color.white;
     private new string tag = "line";
     private Ray inputRay;
     private bool isFirstPoint = true;
+    private bool stage;
     private ARPlaneManager planeManager;
     private ARSessionOrigin sessionOrigin;
-    private Camera arCamera;
     private State state = (State)SceneStage.ResetScene;
     private GameObject asset, startPoint, endPoint, door;
-    private ARLineMenifest ScanMenifest = new ARLineMenifest();
+    private readonly List<GameObject> lines = new List<GameObject>();
+    private readonly ARLineMenifest ScanMenifest = new ARLineMenifest();
     private string SceneName;
     
     private NativeArray<XRRaycastHit> raycastHits = new NativeArray<XRRaycastHit>();
@@ -48,12 +51,13 @@ public class NewScanARManager : MonoBehaviour
         }
         sessionOrigin = GetComponent<ARSessionOrigin>();
         planeManager = GetComponent<ARPlaneManager>();
-        arCamera = sessionOrigin.camera;
 
-        HUD.gameObject.SetActive(false);
+        HUD.SetActive(false);
+        MenuIcon.SetActive(false);
+        MenuPanel.SetActive(false);
+        Alert.SetActive(false);
+
         SceneName = NewScanName.SceneName;
-        Debug.Log(SceneName);
-        saveBTM.gameObject.SetActive(false);
 
         startPoint = Instantiate(pointsPrefab, Vector3.zero, Quaternion.identity);
         endPoint = Instantiate(pointsPrefab, Vector3.zero, Quaternion.identity);
@@ -90,7 +94,7 @@ public class NewScanARManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            inputRay = arCamera.ScreenPointToRay(Input.mousePosition);
+            inputRay = sessionOrigin.camera.ScreenPointToRay(Input.mousePosition);
             raycastHits = planeManager.Raycast(inputRay, TrackableType.All, Allocator.Temp);
 
             if (raycastHits.Length > 0)
@@ -99,7 +103,8 @@ public class NewScanARManager : MonoBehaviour
                 door.transform.SetPositionAndRotation(hitPose.position, Quaternion.identity);
                 door.SetActive(true);
                 state = State.placeLines;
-                HUD.gameObject.SetActive(true);               
+                HUD.SetActive(true);
+                MenuIcon.SetActive(true);
                 textMeshPro.text = "Draw Pipes";
             }
         }
@@ -118,7 +123,7 @@ public class NewScanARManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
         {      
-            inputRay = arCamera.ScreenPointToRay(Input.mousePosition);
+            inputRay = sessionOrigin.camera.ScreenPointToRay(Input.mousePosition);
             raycastHits = planeManager.Raycast(inputRay, TrackableType.All, Allocator.Temp);
 
             if (raycastHits.Length > 0)
@@ -133,7 +138,6 @@ public class NewScanARManager : MonoBehaviour
                     DrawLine();
                     startPoint.SetActive(false);
                     endPoint.SetActive(false);
-                    saveBTM.gameObject.SetActive(true);
                 }
 
                 // Toggle the bool so next we will place the next point.
@@ -145,17 +149,18 @@ public class NewScanARManager : MonoBehaviour
 
     private void DrawLine()
     {
-        Vector3 mid;
-        var DistanceVectors = CalcVectors(startPoint.transform.position, 
-                                          endPoint.transform.position, 
-                                          door.transform.position, out mid);
+        var DistanceVectors = CalcVectors(startPoint.transform.position,
+                                          endPoint.transform.position,
+                                          door.transform.position, out Vector3 mid);
 
-        addNewLine(DistanceVectors);
+        AddNewLine(DistanceVectors);
         
         GameObject newLine = Instantiate(linePrefab, mid, Quaternion.identity);
 
         SetLine(ref newLine);
-        
+
+        lines.Add(newLine);
+
         newLine.SetActive(true);  
     }
 
@@ -173,7 +178,7 @@ public class NewScanARManager : MonoBehaviour
     /// Create new line Descriptor and add it to the line container 
     /// </summary>
     /// <param name="distanceVectors">Tuple of position vectors (mid, start, end)</param>
-    private void addNewLine(Tuple<Vector3, Vector3, Vector3> distanceVectors)
+    private void AddNewLine(Tuple<Vector3, Vector3, Vector3> distanceVectors)
     {
         ARLineDefinition definition = new ARLineDefinition(tag, color, distanceVectors);
 
@@ -212,24 +217,23 @@ public class NewScanARManager : MonoBehaviour
         Debug.Log(data);
 
         File.WriteAllText(Application.persistentDataPath + $"/Scans/{SceneName}", data);
-        SceneManager.LoadScene("MainMenu");
     }
 
-    private static void _ShowAndroidToastMessage(string message)
-    {
-        AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        AndroidJavaObject unityActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+    //private static void _ShowAndroidToastMessage(string message)
+    //{
+    //    AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+    //    AndroidJavaObject unityActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
 
-        if (unityActivity != null)
-        {
-            AndroidJavaClass toastClass = new AndroidJavaClass("android.widget.Toast");
-            unityActivity.Call("runOnUiThread", new AndroidJavaRunnable(() =>
-            {
-                AndroidJavaObject toastObject = toastClass.CallStatic<AndroidJavaObject>("makeText", unityActivity, message, 0);
-                toastObject.Call("show");
-            }));
-        }
-    }
+    //    if (unityActivity != null)
+    //    {
+    //        AndroidJavaClass toastClass = new AndroidJavaClass("android.widget.Toast");
+    //        unityActivity.Call("runOnUiThread", new AndroidJavaRunnable(() =>
+    //        {
+    //            AndroidJavaObject toastObject = toastClass.CallStatic<AndroidJavaObject>("makeText", unityActivity, message, 0);
+    //            toastObject.Call("show");
+    //        }));
+    //    }
+    //}
 
     public void SetLineAtt(int x)
     {
@@ -252,6 +256,46 @@ public class NewScanARManager : MonoBehaviour
                 tag = "Normal";
                 break;
         }
+    }
+
+    public void OnSavePress()
+    {
+        alertText.text = "Save and Exit?";
+        stage = true;
+        Alert.SetActive(true);
+        MenuPanel.SetActive(false);
+    }
+
+    public void OnExitPress()
+    {
+        alertText.text = "Are You sure you want to exit to\nmain menu without save?\n\nall data will be lost.";
+        stage = false;
+        Alert.SetActive(true);
+        MenuPanel.SetActive(false);
+    }
+
+    public void OnMenuPress()
+    {
+        MenuPanel.SetActive(true);
+    }
+    public void OnExitMenuPress()
+    {
+        MenuPanel.SetActive(false);
+    }
+
+    public void OnConfirmPress()
+    {
+        if (stage)
+        {
+             Save();
+        }
+   
+        SceneManager.LoadScene("MainMenu");
+    }
+    public void OnCancelPress()
+    {
+        Alert.SetActive(false);
+        MenuPanel.SetActive(true);
     }
 
 

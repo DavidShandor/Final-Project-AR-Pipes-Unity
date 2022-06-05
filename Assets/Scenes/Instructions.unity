@@ -569,7 +569,14 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "This app allows you to scan \na room and save various building \npipes
-    that can later be shown in their original location.\n"
+    that can later be shown in their original location.\nIn order to start scanning,
+    you must first stand directly in front of the entrace to the room and point the
+    camera towards the door.\nThen you will be prompted to place a cube in the bottom
+    right corner.\nOnce this is done, you can begin scanning and selecting the type
+    of object you wish you save.\nthere are 3 icons - hot pipes,cold pipes and electric
+    pipes. Select the pipe and the press once for the start position and again for
+    the end position of the pipe. Save the scan and then the scan can be reloaded
+    at your conveniece.\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -646,6 +653,40 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1501419336}
   m_CullTransparentMesh: 1
+--- !u!21 &1527012557
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UI/RoundedCorners/RoundedCorners
+  m_Shader: {fileID: 4800000, guid: 0bd2ec5d73751e34a814274a454bec41, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _ColorMask: 15
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UseUIAlphaClip: 0
+    m_Colors:
+    - _WidthHeightRadius: {r: 350, g: 80, b: 50, a: 0}
+  m_BuildTextureStacks: []
 --- !u!1 &1588352500
 GameObject:
   m_ObjectHideFlags: 0
@@ -712,40 +753,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &1814515917
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: UI/RoundedCorners/RoundedCorners
-  m_Shader: {fileID: 4800000, guid: 0bd2ec5d73751e34a814274a454bec41, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats:
-    - _ColorMask: 15
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _UseUIAlphaClip: 0
-    m_Colors:
-    - _WidthHeightRadius: {r: 250, g: 50, b: 50, a: 0}
-  m_BuildTextureStacks: []
 --- !u!1001 &1885120404
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -791,11 +798,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7723292848677800671, guid: 04616da7f0441b94ca03926541e56e2b, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 250
+      value: 350
       objectReference: {fileID: 0}
     - target: {fileID: 7723292848677800671, guid: 04616da7f0441b94ca03926541e56e2b, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 50
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 7723292848677800671, guid: 04616da7f0441b94ca03926541e56e2b, type: 3}
       propertyPath: m_LocalPosition.x

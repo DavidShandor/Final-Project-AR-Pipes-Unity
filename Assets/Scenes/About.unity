@@ -157,7 +157,7 @@ Material:
     m_Colors:
     - _WidthHeightRadius: {r: 250, g: 50, b: 50, a: 0}
   m_BuildTextureStacks: []
---- !u!21 &991363595
+--- !u!21 &403285506
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
@@ -189,7 +189,7 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _WidthHeightRadius: {r: 250, g: 50, b: 50, a: 0}
+    - _WidthHeightRadius: {r: 350, g: 80, b: 50, a: 0}
   m_BuildTextureStacks: []
 --- !u!1 &1118089654
 GameObject:
@@ -796,11 +796,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7723292848677800671, guid: 04616da7f0441b94ca03926541e56e2b, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 250
+      value: 350
       objectReference: {fileID: 0}
     - target: {fileID: 7723292848677800671, guid: 04616da7f0441b94ca03926541e56e2b, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 50
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 7723292848677800671, guid: 04616da7f0441b94ca03926541e56e2b, type: 3}
       propertyPath: m_LocalPosition.x

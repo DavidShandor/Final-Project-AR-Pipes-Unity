@@ -46,7 +46,7 @@ public class NewScanARManager : MonoBehaviour
        
         if (state == State.placeDoor)
         {
-            textMeshPro.text = "Touch the Left-Rigth\nDoor Corner to Place Door";
+            textMeshPro.text = "Tap the bottom-Right\nDoor edge to Place Cube Marker";
             okBTM.gameObject.SetActive(false);
         }
         sessionOrigin = GetComponent<ARSessionOrigin>();
@@ -268,7 +268,7 @@ public class NewScanARManager : MonoBehaviour
 
     public void OnExitPress()
     {
-        alertText.text = "Are You sure you want to exit to\nmain menu without save?\n\nall data will be lost.";
+        alertText.text = "Are You sure you want to exit to\nmain menu without saving?\n\nAll data will be lost.";
         stage = false;
         Alert.SetActive(true);
         MenuPanel.SetActive(false);

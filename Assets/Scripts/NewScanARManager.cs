@@ -46,7 +46,7 @@ public class NewScanARManager : MonoBehaviour
        
         if (state == State.placeDoor)
         {
-            textMeshPro.text = "Tap the bottom-Right\nDoor edge to Place Cube Marker";
+            textMeshPro.text = "Tap the Upper-Left\nDoor edge to Place Cube Marker";
             okBTM.gameObject.SetActive(false);
         }
         sessionOrigin = GetComponent<ARSessionOrigin>();
@@ -115,7 +115,7 @@ public class NewScanARManager : MonoBehaviour
     {
         var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
         xrManagerSettings.DeinitializeLoader();
-        SceneManager.LoadScene(_scene); // reload current scene
+        SceneManager.LoadScene(_scene); 
         xrManagerSettings.InitializeLoaderSync();
     }
 
@@ -217,6 +217,7 @@ public class NewScanARManager : MonoBehaviour
         Debug.Log(data);
 
         File.WriteAllText(Application.persistentDataPath + $"/Scans/{SceneName}", data);
+        SceneStage.ResetScene = (int)State.findDoor;
     }
 
     //private static void _ShowAndroidToastMessage(string message)
@@ -289,8 +290,8 @@ public class NewScanARManager : MonoBehaviour
         {
              Save();
         }
-   
-        SceneManager.LoadScene("MainMenu");
+
+        ResetScene(0);
     }
     public void OnCancelPress()
     {

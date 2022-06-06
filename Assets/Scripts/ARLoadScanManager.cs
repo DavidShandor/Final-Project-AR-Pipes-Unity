@@ -38,7 +38,7 @@ public class ARLoadScanManager : MonoBehaviour
     {   
         if(state == State.placeDoor)
         {
-            textMeshPro.text = "Touch the Left-Rigth\nDoor Corner to show pipes";
+            textMeshPro.text = "Touch the Upper-Left\nDoor Corner to show pipes";
             okBTM.gameObject.SetActive(false);
         }
         sessionOrigin = GetComponent<ARSessionOrigin>();
@@ -71,7 +71,7 @@ public class ARLoadScanManager : MonoBehaviour
         Debug.Log("Reset Scene");
         var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
         xrManagerSettings.DeinitializeLoader();
-        SceneManager.LoadScene(_scene); // reload current scene
+        SceneManager.LoadScene(_scene); 
         xrManagerSettings.InitializeLoaderSync();
     }
 
@@ -184,7 +184,8 @@ public class ARLoadScanManager : MonoBehaviour
     
     public void OnConfirmPress()
     {
-        SceneManager.LoadScene("MainMenu");
+        SceneStage.ResetScene = (int)State.findDoor;
+        ResetScene(0);
     }
     public void OnCancelPress()
     {

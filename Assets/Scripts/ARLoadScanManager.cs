@@ -71,7 +71,7 @@ public class ARLoadScanManager : MonoBehaviour
         Debug.Log("Reset Scene");
         var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
         xrManagerSettings.DeinitializeLoader();
-        SceneManager.LoadScene(_scene); 
+        SceneManager.LoadScene(_scene);
         xrManagerSettings.InitializeLoaderSync();
     }
 
@@ -90,9 +90,12 @@ public class ARLoadScanManager : MonoBehaviour
                 state = State.pickmMesh;
                 MenuIcon.SetActive(true);
                 textMeshPro.text = "";
-                //textMeshPro.text = "Pipes are presenting";
                 AndroidMessage._ShowAndroidToastMessage("Drawing Lines...");
                 DrawLines();
+            }
+            else
+            {
+                AndroidMessage._ShowAndroidToastMessage("Tap on plane only");
             }
         }
     }
@@ -107,8 +110,7 @@ public class ARLoadScanManager : MonoBehaviour
 
     private void Draw(ARLineDefinition arLine)
     {
-        Vector3 _mid;
-        var ReferenceDistance = CalcRelativePosition(arLine.mid, arLine.start, arLine.end, out _mid);
+        var ReferenceDistance = CalcRelativePosition(arLine.mid, arLine.start, arLine.end, out Vector3 _mid);
         GameObject newLine = Instantiate(linePrefab, _mid, Quaternion.identity);
         lines.Add(newLine);
         SetLine(ref newLine, arLine, ReferenceDistance);
@@ -175,7 +177,7 @@ public class ARLoadScanManager : MonoBehaviour
         MenuPanel.SetActive(false);
     }
 
-    public void onMenuPress()
+    public void OnMenuPress()
     {
         MenuPanel.SetActive(true);
     }
@@ -183,7 +185,23 @@ public class ARLoadScanManager : MonoBehaviour
     {
         MenuPanel.SetActive(false);
     }
-    
+
+
+    //private void DestroyAllElements()
+    //{
+    //    foreach (var l in lines)
+    //    {
+    //        Destroy(l);
+    //    }
+
+    //    foreach (ARPlane p in planeManager.trackables)
+    //    {
+    //        Destroy(p);
+    //    }
+
+    //    Destroy(doorObj);
+    //}
+
     public void OnConfirmPress()
     {
         SceneStage.ResetScene = (int)State.findDoor;

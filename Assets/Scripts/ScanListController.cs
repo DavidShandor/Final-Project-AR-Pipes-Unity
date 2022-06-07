@@ -71,6 +71,8 @@ public class ScanListController : MonoBehaviour
         string data = File.ReadAllText(_file.FullName);
         lineMenifest = JsonUtility.FromJson<ARLineMenifest>(data);
         SceneManager.LoadScene("Load");
+        //SwitchScene switchScene = gameObject.AddComponent<SwitchScene>();
+        //switchScene.SwitchScenes("Load");
     }
 
     private void deleteFileRoutine(FileInfo file, ScanButtonItem _obj)

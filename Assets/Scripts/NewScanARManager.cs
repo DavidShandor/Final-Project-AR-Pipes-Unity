@@ -120,7 +120,7 @@ public class NewScanARManager : MonoBehaviour
     {
         var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
         xrManagerSettings.DeinitializeLoader();
-        SceneManager.LoadScene(_scene); 
+        SceneManager.LoadScene(_scene);
         xrManagerSettings.InitializeLoaderSync();
     }
 
@@ -284,6 +284,24 @@ public class NewScanARManager : MonoBehaviour
     {
         MenuPanel.SetActive(false);
     }
+    //private void DestroyAllElements()
+    //{
+    //    foreach (var l in lines)
+    //    {
+    //        Destroy(l);
+    //    }
+
+    //    foreach(ARPlane p in planeManager.trackables)
+    //    {
+    //        Destroy(p);
+    //    }
+
+    //    Destroy(door);
+    //    Destroy(asset);
+    //    Destroy(startPoint);
+    //    Destroy(endPoint);
+
+    //}
 
     public void OnConfirmPress()
     {
@@ -291,8 +309,12 @@ public class NewScanARManager : MonoBehaviour
         {
              Save();
         }
-
         ResetScene(0);
+        ////Destroy all elements
+        //DestroyAllElements();
+        ////animation to main menu
+        //SwitchScene switchScene = gameObject.AddComponent<SwitchScene>();
+        //switchScene.SwitchScenes("MainMenu");
     }
     public void OnCancelPress()
     {

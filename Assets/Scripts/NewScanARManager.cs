@@ -86,6 +86,7 @@ public class NewScanARManager : MonoBehaviour
 
     public void OnOkPressed()
     {
+        AndroidMessage._ShowAndroidToastMessage("Resetting the scene, please wait");
         SceneStage.ResetScene = (int)State.placeDoor;
         ResetScene(SceneManager.GetActiveScene().buildIndex);
     }
@@ -107,6 +108,10 @@ public class NewScanARManager : MonoBehaviour
                 MenuIcon.SetActive(true);
                 textMeshPro.text = "Draw Pipes";
             }
+            else
+            {
+                AndroidMessage._ShowAndroidToastMessage("Tap on plane only");
+            }
         }
     }
 
@@ -122,7 +127,12 @@ public class NewScanARManager : MonoBehaviour
     private void DetectTouch()
     {
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
-        {      
+        {   
+            if (color == Color.white || tag == "line")
+            {
+                AndroidMessage._ShowAndroidToastMessage("Please choose pipe type first");
+                return;
+            }
             inputRay = sessionOrigin.camera.ScreenPointToRay(Input.mousePosition);
             raycastHits = planeManager.Raycast(inputRay, TrackableType.All, Allocator.Temp);
 
@@ -142,6 +152,10 @@ public class NewScanARManager : MonoBehaviour
 
                 // Toggle the bool so next we will place the next point.
                 isFirstPoint = !isFirstPoint;
+            }
+            else
+            {
+                AndroidMessage._ShowAndroidToastMessage("Tap on plane only");
             }
 
         }
@@ -218,23 +232,10 @@ public class NewScanARManager : MonoBehaviour
 
         File.WriteAllText(Application.persistentDataPath + $"/Scans/{SceneName}", data);
         SceneStage.ResetScene = (int)State.findDoor;
+        AndroidMessage._ShowAndroidToastMessage("Scan Saved!");
     }
 
-    //private static void _ShowAndroidToastMessage(string message)
-    //{
-    //    AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-    //    AndroidJavaObject unityActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-
-    //    if (unityActivity != null)
-    //    {
-    //        AndroidJavaClass toastClass = new AndroidJavaClass("android.widget.Toast");
-    //        unityActivity.Call("runOnUiThread", new AndroidJavaRunnable(() =>
-    //        {
-    //            AndroidJavaObject toastObject = toastClass.CallStatic<AndroidJavaObject>("makeText", unityActivity, message, 0);
-    //            toastObject.Call("show");
-    //        }));
-    //    }
-    //}
+    
 
     public void SetLineAtt(int x)
     {

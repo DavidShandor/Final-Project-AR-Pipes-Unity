@@ -45,6 +45,7 @@ public class NewScanName : MonoBehaviour
             {
                 validateText.text = "File name already exist";
                 validateText.gameObject.SetActive(true);
+                start.gameObject.SetActive(false);
             }
         }
     }

@@ -89,7 +89,9 @@ public class ARLoadScanManager : MonoBehaviour
                 DoorRefPosition = hitPose.position;
                 state = State.pickmMesh;
                 MenuIcon.SetActive(true);
-                textMeshPro.text = "Pipes are presenting";
+                textMeshPro.text = "";
+                //textMeshPro.text = "Pipes are presenting";
+                AndroidMessage._ShowAndroidToastMessage("Drawing Lines...");
                 DrawLines();
             }
         }

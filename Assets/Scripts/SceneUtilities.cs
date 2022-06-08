@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SwitchScene : MonoBehaviour
+public class SceneUtilities : MonoBehaviour
 {
     [HideInInspector]
     public static string _action;
@@ -28,7 +28,7 @@ public class SwitchScene : MonoBehaviour
     }
     public void ExitApplication()
     {
-        // Add here an alert "R U sure?" bla bla
+        
         Application.Quit();
     }
 
@@ -36,5 +36,24 @@ public class SwitchScene : MonoBehaviour
     {
         _action = _act;
         SwitchScenes("LoadList");
+    }
+    public void ResetScene(string _scene, bool _reset)
+    {
+        string s = _reset ? "Reset" : "Exit";
+        Debug.Log($"Try to {s} scene");
+        
+        var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
+        
+        if (_reset)
+        {
+            AndroidMessage._ShowAndroidToastMessage("Resetting the scene, please wait");
+            SceneManager.LoadScene(_scene);
+        }
+        else
+        {
+            SwitchScenes(_scene);
+        }
+
+        xrManagerSettings.InitializeLoaderSync();
     }
 }

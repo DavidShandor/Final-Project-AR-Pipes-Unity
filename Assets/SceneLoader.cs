@@ -8,13 +8,9 @@ public class SceneLoader : MonoBehaviour
 
     public Animator transition;
     [Tooltip("Transition Time")]
-    public float transitionTime = 1f;
-    // Update is called once per frame
-    void Update()
-    {
-        //StartCoroutine(Loadlevel(0));
-    }
-
+    public float transitionTime = 0.5f;
+ 
+  
     IEnumerator Loadlevel(string scene)
     {
         transition.SetTrigger("Start");

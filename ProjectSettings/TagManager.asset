@@ -10,6 +10,8 @@ TagManager:
   - Hot
   - Cold
   - Normal
+  - SceneLoader
+  - Crossfade
   layers:
   - Default
   - TransparentFX

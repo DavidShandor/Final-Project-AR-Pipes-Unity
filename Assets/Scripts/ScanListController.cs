@@ -11,6 +11,7 @@ public class ScanListController : MonoBehaviour
     [SerializeField] private Text title, _scanName, Message;
     //[SerializeField] private Button btnCancel, btnConfirm;
     [HideInInspector] public static ARLineMenifest lineMenifest;
+    [HideInInspector] public SceneUtilities sceneUtile;
 
     private FileInfo _file;
     private GameObject toDestroy;
@@ -19,13 +20,13 @@ public class ScanListController : MonoBehaviour
   
     private void OnEnable()
     {
-       _action = SwitchScene._action;
+       _action = SceneUtilities._action;
         Debug.Log(_action);
     }
     void Start()
     {
         title.gameObject.SetActive(false);
-        AlertMessage.gameObject.SetActive(false);
+        AlertMessage.SetActive(false);
 
         if (!Directory.Exists(Application.persistentDataPath + "/Scans"))
         {
@@ -36,6 +37,8 @@ public class ScanListController : MonoBehaviour
         {
             LoadScanButtons();
         }
+
+        sceneUtile = GameObject.FindGameObjectWithTag("Crossfade").GetComponent<SceneUtilities>();
     }
 
     private void LoadScanButtons()
@@ -70,19 +73,17 @@ public class ScanListController : MonoBehaviour
     {
         string data = File.ReadAllText(_file.FullName);
         lineMenifest = JsonUtility.FromJson<ARLineMenifest>(data);
-        SceneManager.LoadScene("Load");
-        //SwitchScene switchScene = gameObject.AddComponent<SwitchScene>();
-        //switchScene.SwitchScenes("Load");
+        sceneUtile.SwitchScenes("Load");
     }
 
-    private void deleteFileRoutine(FileInfo file, ScanButtonItem _obj)
-    {
-        Debug.Log("Try to Delete File");
-        _scanName.text = file.Name;
-        _file = file;
-        toDestroy = _obj.gameObject;
-        AlertMessage.SetActive(true);
-    }
+    //private void deleteFileRoutine(FileInfo file, ScanButtonItem _obj)
+    //{
+    //    Debug.Log("Try to Delete File");
+    //    _scanName.text = file.Name;
+    //    _file = file;
+    //    toDestroy = _obj.gameObject;
+    //    AlertMessage.SetActive(true);
+    //}
 
     
     public void OnConfirmPress()
@@ -90,7 +91,7 @@ public class ScanListController : MonoBehaviour
         switch (_action)
         {
             case "Delete":
-                deleteFile();
+                DeleteFile();
                 break;
             case "Load":
                 LoadScan();
@@ -101,7 +102,7 @@ public class ScanListController : MonoBehaviour
 
     }
 
-    private void deleteFile()
+    private void DeleteFile()
     {
         try
         {

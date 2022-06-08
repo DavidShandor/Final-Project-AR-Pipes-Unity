@@ -25,20 +25,20 @@ public class NewScanARManager : MonoBehaviour
     [SerializeField] private Button okBTM;
     public TMPro.TextMeshProUGUI textMeshPro, alertText;
 
-    private Color color = Color.white;
-    private new string tag = "line";
+    private bool save;
     private Ray inputRay;
+    private string SceneName;
+    private new string tag = "line";
     private bool isFirstPoint = true;
-    private bool stage;
+    private Color color = Color.white;
     private ARPlaneManager planeManager;
     private ARSessionOrigin sessionOrigin;
     private State state = (State)SceneStage.ResetScene;
     private GameObject asset, startPoint, endPoint, door;
     private readonly List<GameObject> lines = new List<GameObject>();
     private readonly ARLineMenifest ScanMenifest = new ARLineMenifest();
-    private string SceneName;
-    
     private NativeArray<XRRaycastHit> raycastHits = new NativeArray<XRRaycastHit>();
+    [HideInInspector] public SceneUtilities sceneUtil;
 
     void Awake()
     {
@@ -52,22 +52,28 @@ public class NewScanARManager : MonoBehaviour
         sessionOrigin = GetComponent<ARSessionOrigin>();
         planeManager = GetComponent<ARPlaneManager>();
 
+        SceneName = NewScanName.SceneName;
+
+        sceneUtil = GameObject.FindGameObjectWithTag("Crossfade").GetComponent<SceneUtilities>();
+    }
+
+    private void Start()
+    {
         HUD.SetActive(false);
         MenuIcon.SetActive(false);
         MenuPanel.SetActive(false);
         Alert.SetActive(false);
 
-        SceneName = NewScanName.SceneName;
-
         startPoint = Instantiate(pointsPrefab, Vector3.zero, Quaternion.identity);
         endPoint = Instantiate(pointsPrefab, Vector3.zero, Quaternion.identity);
         door = Instantiate(doorPrefab, Vector3.zero, Quaternion.identity);
-        
+
         startPoint.SetActive(false);
         endPoint.SetActive(false);
         door.SetActive(false);
 
         isFirstPoint = true;
+
     }
 
 
@@ -86,9 +92,8 @@ public class NewScanARManager : MonoBehaviour
 
     public void OnOkPressed()
     {
-        AndroidMessage._ShowAndroidToastMessage("Resetting the scene, please wait");
         SceneStage.ResetScene = (int)State.placeDoor;
-        ResetScene(SceneManager.GetActiveScene().buildIndex);
+        sceneUtil.ResetScene("NewScan", true);
     }
 
     private void PlaceDoor()
@@ -116,13 +121,15 @@ public class NewScanARManager : MonoBehaviour
     }
 
     // This metod reset the scene and load by index
-    private void ResetScene(int _scene)
-    {
-        var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
-        xrManagerSettings.DeinitializeLoader();
-        SceneManager.LoadScene(_scene);
-        xrManagerSettings.InitializeLoaderSync();
-    }
+    //private void ResetScene(string _scene)
+    //{
+    //    var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
+    //    xrManagerSettings.DeinitializeLoader();
+    //    //SceneManager.LoadScene(_scene);
+    //    SwitchScene switchScene = GameObject.FindGameObjectWithTag("Crossfade").GetComponent<SwitchScene>();
+    //    switchScene.SwitchScenes(_scene);
+    //    xrManagerSettings.InitializeLoaderSync();
+    //}
 
     private void DetectTouch()
     {
@@ -263,7 +270,7 @@ public class NewScanARManager : MonoBehaviour
     public void OnSavePress()
     {
         alertText.text = "Save and Exit?";
-        stage = true;
+        save = true;
         Alert.SetActive(true);
         MenuPanel.SetActive(false);
     }
@@ -271,7 +278,7 @@ public class NewScanARManager : MonoBehaviour
     public void OnExitPress()
     {
         alertText.text = "Are You sure you want to exit to\nmain menu without saving?\n\nAll data will be lost.";
-        stage = false;
+        save = false;
         Alert.SetActive(true);
         MenuPanel.SetActive(false);
     }
@@ -284,37 +291,14 @@ public class NewScanARManager : MonoBehaviour
     {
         MenuPanel.SetActive(false);
     }
-    //private void DestroyAllElements()
-    //{
-    //    foreach (var l in lines)
-    //    {
-    //        Destroy(l);
-    //    }
-
-    //    foreach(ARPlane p in planeManager.trackables)
-    //    {
-    //        Destroy(p);
-    //    }
-
-    //    Destroy(door);
-    //    Destroy(asset);
-    //    Destroy(startPoint);
-    //    Destroy(endPoint);
-
-    //}
 
     public void OnConfirmPress()
     {
-        if (stage)
+        if (save)
         {
              Save();
         }
-        ResetScene(0);
-        ////Destroy all elements
-        //DestroyAllElements();
-        ////animation to main menu
-        //SwitchScene switchScene = gameObject.AddComponent<SwitchScene>();
-        //switchScene.SwitchScenes("MainMenu");
+        sceneUtil.ResetScene("MainMenu", false);
     }
     public void OnCancelPress()
     {

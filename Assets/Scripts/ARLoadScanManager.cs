@@ -33,6 +33,7 @@ public class ARLoadScanManager : MonoBehaviour
     private State state = (State)SceneStage.ResetScene;
     private List<GameObject> lines = new List<GameObject>();
     private NativeArray<XRRaycastHit> raycastHits = new NativeArray<XRRaycastHit>();
+    [HideInInspector] public SceneUtilities switchScene;
 
     void Awake()
     {   
@@ -50,6 +51,8 @@ public class ARLoadScanManager : MonoBehaviour
         MenuPanel.SetActive(false);
         MenuIcon.SetActive(false);
         Alert.SetActive(false);
+
+        switchScene = GameObject.FindGameObjectWithTag("Crossfade").GetComponent<SceneUtilities>();
     }
 
     // Update is called once per frame
@@ -63,17 +66,18 @@ public class ARLoadScanManager : MonoBehaviour
     public void OnOkPressed()
     {
         SceneStage.ResetScene = (int)State.placeDoor;
-        ResetScene(SceneManager.GetActiveScene().buildIndex);
+        switchScene.ResetScene("Load", true);
     }
 
-    private void ResetScene(int _scene)
-    {
-        Debug.Log("Reset Scene");
-        var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
-        xrManagerSettings.DeinitializeLoader();
-        SceneManager.LoadScene(_scene);
-        xrManagerSettings.InitializeLoaderSync();
-    }
+    //private void ResetScene(string _scene)
+    //{
+    //    Debug.Log("Reset Scene");
+    //    var xrManagerSettings = UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager;
+    //    //SceneManager.LoadScene(_scene);
+    //    SwitchScene switchScene = GameObject.FindGameObjectWithTag("Crossfade").GetComponent<SwitchScene>();
+    //    switchScene.SwitchScenes(_scene);
+    //    xrManagerSettings.InitializeLoaderSync();
+    //}
 
     private void PlaceDoor()
     {
@@ -205,7 +209,7 @@ public class ARLoadScanManager : MonoBehaviour
     public void OnConfirmPress()
     {
         SceneStage.ResetScene = (int)State.findDoor;
-        ResetScene(0);
+        switchScene.ResetScene("MainMenu", false);
     }
     public void OnCancelPress()
     {

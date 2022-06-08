@@ -220,7 +220,7 @@ GameObject:
   - component: {fileID: 1920814834491799243}
   m_Layer: 0
   m_Name: SceneLoader
-  m_TagString: Untagged
+  m_TagString: Crossfade
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -253,4 +253,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transition: {fileID: 5640403263728571063}
-  transitionTime: 1
+  transitionTime: 0.5

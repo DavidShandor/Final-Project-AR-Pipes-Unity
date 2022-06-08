@@ -9,20 +9,33 @@ using System.Linq;
 
 public class NewScanName : MonoBehaviour 
 {
+    // Editor fields
     [SerializeField] private InputField input;
     [SerializeField] private TextMeshProUGUI validateText;
     [SerializeField] private Button start;
-    
+
+    [HideInInspector]
+    public SceneUtilities switchScene;
+
+    // Global variable to transfer data between scenes
     public static string SceneName;
 
+    // Awake is called once in the very beginning of the scene.
     private void Awake()
     {
+        //Hide start button and alert text.
         start.gameObject.SetActive(false);
         validateText.gameObject.SetActive(false);
+
+        switchScene = GameObject.FindGameObjectWithTag("Crossfade").GetComponent<SceneUtilities>();
     }
-    public void onValueChange()
+
+    /// <summary>
+    /// Called every time the input change.
+    /// </summary>
+    public void OnValueChange()
     {
-        if (input.text == "")
+        if (input.text == "") // Empty input - hide start and alert.
         {
             start.gameObject.SetActive(false);
             validateText.gameObject.SetActive(false);
@@ -36,13 +49,14 @@ public class NewScanName : MonoBehaviour
                 validateText.gameObject.SetActive(true);
                 start.gameObject.SetActive(false);
             }
-            else if(validationByName(input.text.Trim(' ')))
+            // Validate the input.
+            else if(ValidationByName(input.text.Trim(' ')))
             {
                 validateText.gameObject.SetActive(false);
                 start.gameObject.SetActive(true);
             }
-            else
-            {
+            else // File name already exist.
+            {   
                 validateText.text = "File name already exist";
                 validateText.gameObject.SetActive(true);
                 start.gameObject.SetActive(false);
@@ -50,14 +64,20 @@ public class NewScanName : MonoBehaviour
         }
     }
 
-    //Validate the input.
-    private bool validationByName(string fileName)
-    {
+    /// <summary>
+    /// Check if file name already exist or not.
+    /// </summary>
+    /// <param name="fileName">File name to check</param>
+    /// <returns></returns>
+    private bool ValidationByName(string fileName)
+    {   
+        // Check if Scans directory exist.
         if (Directory.Exists(Application.persistentDataPath + "/Scans"))
         {   
             DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath + "/Scans");
             FileInfo[] info = dir.GetFiles();
 
+            // Check each file name
             foreach (FileInfo f in info)
             {
                 if(f.Name == fileName) return false;
@@ -67,12 +87,15 @@ public class NewScanName : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Called when the user press Start and start New Scan scene.
+    /// </summary>
     public void OnPressStart()
     {
-        //TODO: Validate the input?
         SceneName = input.text;
         input.text = "";
-        SceneManager.LoadScene("NewScan");
+        switchScene.SwitchScenes("NewScan");
+        //SceneManager.LoadScene("NewScan");
     }
   
 }

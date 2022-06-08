@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 
+/// <summary>
+/// Scans list button class
+/// </summary>
 public class ScanButtonItem : MonoBehaviour
 {
     [HideInInspector] public FileInfo file;

@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class AndroidMessage : MonoBehaviour
 {
+    /// <summary>
+    /// Show toast message in the screen bottom
+    /// </summary>
+    /// <param name="message">Message to be shown</param>
     public static void _ShowAndroidToastMessage(string message)
     {
         AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");

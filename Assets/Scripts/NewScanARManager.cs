@@ -1,7 +1,7 @@
 using System.IO;
 using Unity.Collections;
 using System.Collections.Generic;
-
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
@@ -26,7 +26,7 @@ public class NewScanARManager : MonoBehaviour
     [SerializeField]
     private GameObject pointsPrefab, doorPrefab, linePrefab, HUD, MenuIcon, MenuPanel, Alert;
     [SerializeField] private Button okBTM;
-    public TMPro.TextMeshProUGUI textMeshPro, alertText;
+    public TextMeshProUGUI textMeshPro, alertText;
 
     // Variables and Objects Reference.
     private bool save;

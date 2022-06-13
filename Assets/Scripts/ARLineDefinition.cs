@@ -7,14 +7,12 @@ using UnityEngine;
 [Serializable]
 public class ARLineDefinition
 {
-    // Line Attributes 
+    // Pipe Attributes 
     public string tag;
-    public bool visible = true;
+    //public bool visible = true;
     public Color color;
-    public Vector3 mid;
-    public Vector3 start;
-    public Vector3 end;
-
+    public Tuple<Vector3, Vector3, Vector3> position;
+   
     /// <summary>
     /// Constructor
     /// </summary>
@@ -25,9 +23,7 @@ public class ARLineDefinition
     {
         this.tag = tag;
         this.color = color;
-        mid = position.Item1;
-        start = position.Item2;
-        end = position.Item3;
+        this.position = position;  
     }
 }
 

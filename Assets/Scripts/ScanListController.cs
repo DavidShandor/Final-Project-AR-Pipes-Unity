@@ -10,9 +10,9 @@ using System;
 public class ScanListController : MonoBehaviour
 {
     // Editor fields
-    [SerializeField] private GameObject ScanBtnPref, AlertMessage;
+    [SerializeField] private GameObject ScanBtnPref, AlertMessage, ItemPanel;
     [SerializeField] private Transform ScanBtnParent;
-    [SerializeField] private Text title, _scanName, Message;
+    [SerializeField] private Text title, scanNameAlert, Message, scanNamePanel;
 
     // Variable to store data from file.
     [HideInInspector] public static ARLineMenifest lineMenifest;
@@ -25,19 +25,13 @@ public class ScanListController : MonoBehaviour
     private GameObject toDestroy;
     private string _action;
     
-  
-    // Called when the script is enable.
-    private void OnEnable()
-    {
-       _action = SceneUtilities._action;
-        Debug.Log(_action);
-    }
 
     // Called in the first frame.
     void Start()
     {
         // Hide alert and message "no scan".
         title.gameObject.SetActive(false);
+        ItemPanel.SetActive(false); 
         AlertMessage.SetActive(false);
 
         if (!Directory.Exists(Application.persistentDataPath + "/Scans"))
@@ -87,11 +81,29 @@ public class ScanListController : MonoBehaviour
     /// <param name="obj">Button gameobject (for delete)</param>
     public void OnScanButtonClicked(FileInfo file, ScanButtonItem obj)
     {
-        _scanName.text = file.Name;
+        scanNameAlert.text = file.Name;
+        scanNamePanel.text = file.Name;
         _file = file;
-        Message.text = $"Are you sure want to {_action} this scan?";
+        //Message.text = $"Are you sure want to {_action} this scan?";
         toDestroy = obj.gameObject;
+        ItemPanel.SetActive(true);
+        //AlertMessage.SetActive(true);
+    }
+
+    public void OnLoadPress()
+    {
+        _action = "load";
+        Message.text = $"Are you sure want to {_action} this scan?";
         AlertMessage.SetActive(true);
+        ItemPanel.SetActive(false);
+    }
+
+    public void OnDeletePress()
+    {
+        _action = "delete";
+        Message.text = $"Are you sure want to {_action} this scan?";
+        AlertMessage.SetActive(true);
+        ItemPanel.SetActive(false);
     }
 
     /// <summary>
@@ -111,10 +123,10 @@ public class ScanListController : MonoBehaviour
     {
         switch (_action)
         {
-            case "Delete":
+            case "delete":
                 DeleteFile();
                 break;
-            case "Load":
+            case "load":
                 LoadScan();
                 break;
 
@@ -152,6 +164,7 @@ public class ScanListController : MonoBehaviour
     public void OnCancelPress()
     {
         AlertMessage.SetActive(false);
+        ItemPanel.SetActive(true);
     }
 
     /// <summary>
@@ -162,5 +175,11 @@ public class ScanListController : MonoBehaviour
         ScrollRect ScrollView = GetComponent<ScrollRect>();
         ScrollView.gameObject.SetActive(false);
         title.gameObject.SetActive(true);
+    }
+
+
+    public void OnClosePressed()
+    {
+        ItemPanel.SetActive(false);
     }
 }

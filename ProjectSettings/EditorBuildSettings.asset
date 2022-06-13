@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/NewScan.unity
     guid: 15a5bf93fd7ffbb4394ff143a13ccd34
   - enabled: 1
-    path: Assets/Scenes/LoadList.unity
+    path: Assets/Scenes/ScansList.unity
     guid: 572dd69ef17a46647ab4b96ed40c66fc
   - enabled: 1
     path: Assets/Scenes/About.unity

@@ -74,8 +74,7 @@ public class ScanListController : MonoBehaviour
     }
 
     /// <summary>
-    /// Called when press the scan button and show alert depent the _action value
-    /// _action = Delete or Load.
+    /// Called when press the scan button and show item options
     /// </summary>
     /// <param name="file">Saved file</param>
     /// <param name="obj">Button gameobject (for delete)</param>
@@ -84,27 +83,23 @@ public class ScanListController : MonoBehaviour
         scanNameAlert.text = file.Name;
         scanNamePanel.text = file.Name;
         _file = file;
-        //Message.text = $"Are you sure want to {_action} this scan?";
         toDestroy = obj.gameObject;
         ItemPanel.SetActive(true);
-        //AlertMessage.SetActive(true);
+        
     }
 
-    public void OnLoadPress()
+    /// <summary>
+    /// Called when press the item panel button and show alert depent the _action value
+    /// </summary>
+    /// <param name="action">Delete or Load</param>
+    public void OnPanelButtonPress(string action)
     {
-        _action = "load";
+        _action = action;
         Message.text = $"Are you sure want to {_action} this scan?";
         AlertMessage.SetActive(true);
         ItemPanel.SetActive(false);
     }
 
-    public void OnDeletePress()
-    {
-        _action = "delete";
-        Message.text = $"Are you sure want to {_action} this scan?";
-        AlertMessage.SetActive(true);
-        ItemPanel.SetActive(false);
-    }
 
     /// <summary>
     /// Read file data and store it in variable to transfer it to the next scene, then go to Load scene.
@@ -123,10 +118,10 @@ public class ScanListController : MonoBehaviour
     {
         switch (_action)
         {
-            case "delete":
+            case "Delete":
                 DeleteFile();
                 break;
-            case "load":
+            case "Load":
                 LoadScan();
                 break;
 
@@ -177,7 +172,9 @@ public class ScanListController : MonoBehaviour
         title.gameObject.SetActive(true);
     }
 
-
+    /// <summary>
+    /// Close the item panel.
+    /// </summary>
     public void OnClosePressed()
     {
         ItemPanel.SetActive(false);

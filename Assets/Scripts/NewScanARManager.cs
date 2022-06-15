@@ -39,7 +39,6 @@ public class NewScanARManager : MonoBehaviour
     private ARSessionOrigin sessionOrigin;
     private State state = (State)SceneStage.ResetScene;
     private GameObject asset, startPoint, endPoint, door;
-    //private readonly List<GameObject> lines = new List<GameObject>();
     private readonly ARLineMenifest ScanMenifest = new ARLineMenifest();
     private NativeArray<XRRaycastHit> raycastHits = new NativeArray<XRRaycastHit>();
     [HideInInspector] public SceneUtilities sceneUtil;
@@ -241,7 +240,7 @@ public class NewScanARManager : MonoBehaviour
     ///          2. Middle point relative to door position.<br/>
     ///          3. Start point relative to door position.<br/>
     ///          4. End point relative to door position.</returns>
-    private static Tuple<Vector3,Vector3,Vector3> CalcVectors(Vector3 startPoint, Vector3 endPoint, Vector3 doorPoint, out Vector3 _mid)
+    private Tuple<Vector3,Vector3,Vector3> CalcVectors(Vector3 startPoint, Vector3 endPoint, Vector3 doorPoint, out Vector3 _mid)
     {
         _mid = Vector3.Lerp(startPoint, endPoint, 0.5f);
         return new Tuple<Vector3, Vector3, Vector3>(doorPoint - _mid, // middle

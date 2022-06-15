@@ -27,7 +27,7 @@ public class ARLoadScanManager : MonoBehaviour
     public SceneUtilities switchScene;
 
     [SerializeField]
-    private GameObject doorPrefab, linePrefab,MenuIcon, MenuPanel, Alert;
+    private GameObject doorPrefab, linePrefab, MenuIcon, MenuPanel, Alert;
 
     // Objects and References 
     private Ray inputRay;

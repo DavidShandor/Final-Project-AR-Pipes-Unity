@@ -11,7 +11,8 @@ public class ARLineDefinition
     public string tag;
     //public bool visible = true;
     public Color color;
-    public Tuple<Vector3, Vector3, Vector3> position;
+    public Vector3 mid, start, end;
+    
    
     /// <summary>
     /// Constructor
@@ -23,7 +24,9 @@ public class ARLineDefinition
     {
         this.tag = tag;
         this.color = color;
-        this.position = position;  
+        this.mid = position.Item1;
+        this.start = position.Item2;
+        this.end = position.Item3;
     }
 }
 

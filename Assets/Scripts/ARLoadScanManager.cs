@@ -131,7 +131,7 @@ public class ARLoadScanManager : MonoBehaviour
     /// <param name="arLine">Line definition to draw</param>
     private void Draw(ARLineDefinition arLine)
     {
-        var ReferenceDistance = CalcRelativePosition(arLine.position, out Vector3 _mid);
+        var ReferenceDistance = CalcRelativePosition(new Tuple<Vector3, Vector3, Vector3>(arLine.mid, arLine.start, arLine.end),out Vector3 _mid);
         GameObject newLine = Instantiate(linePrefab, _mid, Quaternion.identity);
         lines.Add(newLine);
         SetLine(ref newLine, arLine, ReferenceDistance);

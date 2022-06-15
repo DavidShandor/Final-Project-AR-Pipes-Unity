@@ -40,3 +40,5 @@ sysinfo.txt
 Ex_Files_Unity_AR_Visualization_02_Basic_Interactivity.zip
 *.mdj
 *.mdj
+*.aab
+user.keystore

@@ -131,8 +131,8 @@ public class ARLoadScanManager : MonoBehaviour
     /// <param name="arLine">Line definition to draw</param>
     private void Draw(ARLineDefinition arLine)
     {
-        var ReferenceDistance = CalcRelativePosition(new Tuple<Vector3, Vector3, Vector3>(arLine.mid, arLine.start, arLine.end),out Vector3 _mid);
-        GameObject newLine = Instantiate(linePrefab, _mid, Quaternion.identity);
+        var ReferenceDistance = CalcRelativePosition(new Tuple<Vector3, Vector3>(arLine.start, arLine.end));
+        GameObject newLine = Instantiate(linePrefab, arLine.start, Quaternion.identity);
         lines.Add(newLine);
         SetLine(ref newLine, arLine, ReferenceDistance);
         
@@ -159,16 +159,14 @@ public class ARLoadScanManager : MonoBehaviour
     /// <summary>
     /// Calulate the center, start and end positions of the pipe relative to the door position based on the original scanned position. 
     /// </summary>
-    /// <param name="mid">Saved mid position</param>
     /// <param name="start">Saved start position</param>
     /// <param name="end">Saved end position</param>
     /// <param name="_mid">Current pipe mid position</param>
     /// <returns>Positions of the start and the end of the pipe</returns>
-    private Tuple<Vector3, Vector3> CalcRelativePosition(Tuple<Vector3, Vector3, Vector3>position, out Vector3 _mid)
+    private Tuple<Vector3, Vector3> CalcRelativePosition(Tuple<Vector3, Vector3>position)
     {
-        _mid = DoorRefPosition - position.Item1; // mid
-        return new Tuple<Vector3, Vector3>(DoorRefPosition - position.Item2, // start
-                                           DoorRefPosition - position.Item3);// end
+        return new Tuple<Vector3, Vector3>(DoorRefPosition - position.Item1, // start
+                                           DoorRefPosition - position.Item2);// end
     }
 
     /// <summary>

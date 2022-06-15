@@ -50,15 +50,6 @@ public class SceneUtilities : MonoBehaviour
         Application.Quit();
     }
 
-    /// <summary>
-    /// Load "Load list" scene with information about the action to do with the list (Load or Delete scan)
-    /// </summary>
-    /// <param name="_act"></param>
-    //public void LoadList(string _act)
-    //{
-    //    _action = _act;
-    //    SwitchScenes("LoadList");
-    //}
 
     /// <summary>
     /// Reload or exit scene, and clear all the XR data from the scene,

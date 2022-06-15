@@ -185,13 +185,13 @@ public class NewScanARManager : MonoBehaviour
         // Calculate the middle, start and end of the pipe relative to the door position.
         var DistanceVectors = CalcVectors(startPoint.transform.position,
                                           endPoint.transform.position,
-                                          door.transform.position, out Vector3 mid);
+                                          door.transform.position);
 
         // Save pipe data (positions, tag and color) to Menifest 
         AddNewLine(DistanceVectors);
         
         // Instantiate the new pipe.
-        GameObject newLine = Instantiate(linePrefab, mid, Quaternion.identity);
+        GameObject newLine = Instantiate(linePrefab, startPoint.transform.position, Quaternion.identity);
 
         // Set new pipe attributes.
         SetLine(ref newLine);
@@ -221,8 +221,8 @@ public class NewScanARManager : MonoBehaviour
     /// <summary>
     /// Create new pipe Descriptor and add it to the line container 
     /// </summary>
-    /// <param name="distanceVectors">Tuple of position vectors (mid, start, end)</param>
-    private void AddNewLine(Tuple<Vector3, Vector3, Vector3> distanceVectors)
+    /// <param name="distanceVectors">Tuple of position vectors (start, end)</param>
+    private void AddNewLine(Tuple< Vector3, Vector3> distanceVectors)
     {
         ARLineDefinition definition = new ARLineDefinition(tag, color, distanceVectors);
 
@@ -235,17 +235,12 @@ public class NewScanARManager : MonoBehaviour
     /// <param name="startPoint">Position of the start point</param>
     /// <param name="endPoint">Position of the end point</param>
     /// <param name="doorPoint">Position of the door</param>
-    /// <param name="_mid">Position of the middle of the pipe (out)</param>
-    /// <returns>1. Middle position between start point and end point<br/>
-    ///          2. Middle point relative to door position.<br/>
-    ///          3. Start point relative to door position.<br/>
-    ///          4. End point relative to door position.</returns>
-    private Tuple<Vector3,Vector3,Vector3> CalcVectors(Vector3 startPoint, Vector3 endPoint, Vector3 doorPoint, out Vector3 _mid)
-    {
-        _mid = Vector3.Lerp(startPoint, endPoint, 0.5f);
-        return new Tuple<Vector3, Vector3, Vector3>(doorPoint - _mid, // middle
-                                                    doorPoint - startPoint, // start
-                                                    doorPoint - endPoint); // end
+    /// <returns>1. Start point relative to door position.<br/>
+    ///          2. End point relative to door position.</returns>
+    private Tuple<Vector3,Vector3> CalcVectors(Vector3 startPoint, Vector3 endPoint, Vector3 doorPoint)
+    {  
+        return new Tuple<Vector3, Vector3>(doorPoint - startPoint, // start
+                                           doorPoint - endPoint); // end
     }
 
     /// <summary>
@@ -253,8 +248,6 @@ public class NewScanARManager : MonoBehaviour
     /// </summary>
     public void Save()
     {
-        SceneStage.ResetScene = 0;
-
         if (!Directory.Exists(Application.persistentDataPath + "/Scans"))
         {
             Directory.CreateDirectory(Application.persistentDataPath + "/Scans");
@@ -343,6 +336,7 @@ public class NewScanARManager : MonoBehaviour
         {
              Save();
         }
+        SceneStage.ResetScene = 0;
         sceneUtil.ResetScene("MainMenu", false);
     }
 

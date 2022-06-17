@@ -289,14 +289,21 @@ public class NewScanARManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Called when user press Save on the menu panel. Show alert.
+    /// Called when user press Save on the menu panel. Show  alert.
     /// </summary>
     public void OnSavePress()
-    {
-        alertText.text = "Save and Exit?";
-        save = true;
-        Alert.SetActive(true);
-        MenuPanel.SetActive(false);
+    {   
+        if (ScanMenifest.LineDefinitions.Count == 0)
+        {
+            AndroidMessage._ShowAndroidToastMessage("No pipe to save.");
+        }
+        else
+        {
+            alertText.text = "Save and Exit?";
+            save = true;
+            Alert.SetActive(true);
+            MenuPanel.SetActive(false);
+        }
     }
 
     /// <summary>
